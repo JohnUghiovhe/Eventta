@@ -183,7 +183,7 @@ npm run format
 Explore and test all API endpoints through our interactive Swagger UI interface:
 
 - **Local Development**: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
-- **Production**: [https://eventful-api.onrender.com/api-docs](https://eventful-api.onrender.com/api-docs)
+- **Production**: [https://eventful-api.onrender.com/api-docs](https://eventful-api-eeky.onrender.com)
 
 **Features:**
 - 📚 Complete endpoint documentation with request/response schemas
