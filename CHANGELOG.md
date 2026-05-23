@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the Eventful project are documented below.
+All notable changes to the Eventta project are documented below.
 
 ## Recent Updates (February 2026)
 

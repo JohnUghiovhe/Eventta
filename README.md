@@ -1,4 +1,4 @@
-# Eventful - Event Ticketing Platform
+# Eventta - Event Ticketing Platform
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
@@ -6,7 +6,7 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-9.1-green.svg)](https://www.mongodb.com/)
 [![Redis](https://img.shields.io/badge/Redis-4.6-red.svg)](https://redis.io/)
 
-Eventful is a comprehensive event ticketing and management platform that connects event creators with attendees. From concerts to sports events, Eventful provides a seamless experience for creating, discovering, and attending events.
+Eventta is a comprehensive event ticketing and management platform that connects event creators with attendees. From concerts to sports events, Eventta provides a seamless experience for creating, discovering, and attending events.
 
 ## Features
 
@@ -68,7 +68,7 @@ Eventful is a comprehensive event ticketing and management platform that connect
 1. **Clone the repository**
 ```bash
 git clone <repository-url>
-cd eventful
+cd eventta
 ```
 
 2. **Install dependencies**
@@ -88,7 +88,7 @@ NODE_ENV=development
 PORT=5000
 
 # MongoDB
-MONGODB_URI=mongodb://localhost:27017/eventful
+MONGODB_URI=mongodb://localhost:27017/eventta
 
 # Redis
 REDIS_URL=redis://localhost:6379
@@ -183,7 +183,7 @@ npm run format
 Explore and test all API endpoints through our interactive Swagger UI interface:
 
 - **Local Development**: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
-- **Production**: [https://eventful-api.onrender.com/api-docs](https://eventful-api-eeky.onrender.com)
+- **Production**: [https://eventta-api.onrender.com/api-docs](https://eventta-api-eeky.onrender.com)
 
 **Features:**
 - 📚 Complete endpoint documentation with request/response schemas
@@ -267,7 +267,7 @@ curl -X POST http://localhost:5000/api/payments/verify \
 ## Project Structure
 
 ```
-eventful/
+eventta/
 ├── src/
 │   ├── config/           # Configuration files (DB, Redis, Passport)
 │   ├── controllers/      # Route controllers
@@ -410,7 +410,7 @@ Essential documentation for the project:
 1. **Clone repository**
 ```bash
 git clone <repository-url>
-cd eventful
+cd eventta
 ```
 
 2. **Backend setup**

@@ -1,7 +1,7 @@
 {
-  "name": "eventful-app",
+  "name": "eventta-app",
   "version": "1.0.0",
-  "description": "Eventful - A comprehensive ticketing and event management platform",
+  "description": "Eventta - A comprehensive ticketing and event management platform",
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
