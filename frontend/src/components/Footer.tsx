@@ -1,4 +1,5 @@
 import React from 'react';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -9,10 +10,10 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              🎉 Eventful
+              🎉 {SYSTEM_MESSAGES.footerBrandLine}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Your gateway to unforgettable events. Discover, book, and share amazing experiences.
+              {SYSTEM_MESSAGES.footerCopy}
             </p>
           </div>
 
@@ -65,7 +66,7 @@ const Footer: React.FC = () => {
 
         <div className="border-t border-gray-200 dark:border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
           <p className="text-gray-600 dark:text-gray-400 text-sm">
-            © {currentYear} Eventful. All rights reserved.
+            © {currentYear} {SYSTEM_MESSAGES.appName}. All rights reserved.
           </p>
           <p className="text-gray-600 dark:text-gray-400 text-sm mt-4 sm:mt-0">
             Built by{' '}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ThemeToggle } from './ThemeToggle';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, user, logout, isCreator } = useAuth();
@@ -15,7 +16,7 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="text-amber-400 dark:text-indigo-400 text-2xl font-bold flex items-center">
-               Eventful
+               {SYSTEM_MESSAGES.appName}
             </Link>
           </div>
 

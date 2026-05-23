@@ -3,6 +3,7 @@ import hbs from 'nodemailer-express-handlebars';
 import path from 'path';
 import { Logger } from '../utils/logger';
 import dotenv from 'dotenv';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 dotenv.config();
 
@@ -140,7 +141,7 @@ export class EmailService {
       }
 
       const mailOptions: any = {
-        from: `Eventful <${EMAIL_USER}>`,
+        from: `${SYSTEM_MESSAGES.appName} <${EMAIL_USER}>`,
         to: options.to,
         subject: options.subject
       };
@@ -187,10 +188,10 @@ export class EmailService {
   static async sendWelcomeEmail(to: string, name: string): Promise<void> {
     await this.sendEmail({
       to,
-      subject: 'Welcome to Eventful!',
+      subject: SYSTEM_MESSAGES.email.welcomeSubject,
       html: `
-        <h1>Welcome to Eventful, ${name}!</h1>
-        <p>Thank you for joining Eventful. We're excited to have you on board.</p>
+        <h1>Welcome to ${SYSTEM_MESSAGES.appName}, ${name}!</h1>
+        <p>Thank you for joining ${SYSTEM_MESSAGES.appName}. We're excited to have you on board.</p>
         <p>Start exploring amazing events and create unforgettable memories!</p>
       `
     });
@@ -200,7 +201,7 @@ export class EmailService {
   static async sendPasswordResetEmail(to: string, resetUrl: string): Promise<boolean> {
     return this.sendEmail({
       to,
-      subject: 'Reset your Eventful password',
+      subject: SYSTEM_MESSAGES.email.resetPasswordSubject,
       html: `
         <h1>Password Reset Request</h1>
         <p>We received a request to reset your password.</p>
@@ -230,7 +231,7 @@ export class EmailService {
       organizerName?: string;
     }
   ): Promise<void> {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const frontendUrl = process.env.FRONTEND_URL || SYSTEM_MESSAGES.defaultFrontendUrl;
     const ticketViewUrl = ticketData.ticketId 
       ? `${frontendUrl}/tickets/${ticketData.ticketId}`
       : `${frontendUrl}/my-tickets`;
@@ -357,7 +358,7 @@ export class EmailService {
             </div>
 
             <div class="footer">
-              <p><strong>Eventful</strong> - Your Gateway to Amazing Events</p>
+              <p><strong>${SYSTEM_MESSAGES.email.confirmationFooter}</strong></p>
               <p>
                 <a href="${frontendUrl}">Home</a> · 
                 <a href="${frontendUrl}/events">Browse Events</a> · 
@@ -375,7 +376,7 @@ export class EmailService {
         {
           filename: 'ticket-qr-code.png',
           path: ticketData.qrCode,
-          cid: 'qrcode@eventful'
+          cid: SYSTEM_MESSAGES.email.qrCodeCid
         }
       ]
     });

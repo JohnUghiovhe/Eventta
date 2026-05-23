@@ -9,6 +9,7 @@ import { QRCodeService } from '../services/qrcode.service';
 import { EmailService } from '../services/email.service';
 import { NotificationService } from '../services/notification.service';
 import { Logger } from '../utils/logger';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 import {
   generateTicketNumber,
   generateReference,
@@ -276,7 +277,7 @@ export class PaymentController {
         setImmediate(async () => {
           try {
             // Get organizer details for email
-            let organizerName = 'Eventful';
+            let organizerName: string = SYSTEM_MESSAGES.appName;
             if (event.organizer) {
               const organizer = await User.findById(event.organizer);
               if (organizer) {

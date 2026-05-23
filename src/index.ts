@@ -14,6 +14,8 @@ import { Logger } from './utils/logger';
 import { seedEvents } from './scripts/seed';
 import { fixPaymentIndex } from './scripts/fixPaymentIndex';
 import { swaggerSpec } from './config/swagger';
+import { AppError } from './middleware/errorHandler';
+import { SYSTEM_MESSAGES } from './utils/systemMessages';
 
 dotenv.config();
 
@@ -27,7 +29,7 @@ app.use(helmet());
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     const allowedOrigins = [
-      'https://eventful-frontend-908q.onrender.com',
+      SYSTEM_MESSAGES.defaultFrontendDeploymentUrl,
       'http://localhost:3000',
       'http://localhost:5000'
     ];
@@ -60,14 +62,14 @@ app.use(passport.initialize());
 
 // Root endpoint
 app.get('/', (_req, res) => {
-  res.send('Eventful API is running');
+  res.send(SYSTEM_MESSAGES.apiRunning);
 });
 
 // Health check endpoint
 app.get('/health', (_req, res) => {
   res.json({ 
     status: 'ok', 
-    message: 'Backend is running',
+    message: SYSTEM_MESSAGES.backendRunning,
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV 
   });
@@ -76,15 +78,29 @@ app.get('/health', (_req, res) => {
 // Swagger API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Eventful API Documentation',
+  customSiteTitle: SYSTEM_MESSAGES.apiDocumentationTitle,
   customfavIcon: '/favicon.ico'
 }));
 
 // Routes
 app.use('/api', routes);
 
+// Fallback for unmatched routes
+app.use((_req, _res, next) => {
+  next(new AppError(404, SYSTEM_MESSAGES.responses.notFoundResource));
+});
+
 // Error handler (must be last)
 app.use(errorHandler);
+
+process.on('unhandledRejection', (reason) => {
+  Logger.error('Unhandled promise rejection:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  Logger.error('Uncaught exception:', error);
+  process.exit(1);
+});
 
 // Start server
 const startServer = async () => {

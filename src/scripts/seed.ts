@@ -2,6 +2,7 @@ import User from '../models/User';
 import Event from '../models/Event';
 import { EventStatus, UserRole } from '../types';
 import { Logger } from '../utils/logger';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 const sampleEvents = [
   {
@@ -186,10 +187,10 @@ export async function seedEvents(): Promise<void> {
     }
 
     // Create a demo creator user if it doesn't exist
-    let creator = await User.findOne({ email: 'creator@eventful.com' });
+    let creator = await User.findOne({ email: `creator@${SYSTEM_MESSAGES.appName.toLowerCase()}.com` });
     if (!creator) {
       creator = await User.create({
-        email: 'creator@eventful.com',
+        email: `creator@${SYSTEM_MESSAGES.appName.toLowerCase()}.com`,
         password: 'Demo@123',
         firstName: 'Demo',
         lastName: 'Creator',

@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { isTokenExpired } from '../utils/token';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 // Use the Vite proxy in development, full URL in production
 const API_URL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.DEV ? '/api' : 'https://eventful-api.onrender.com/api');
+  (import.meta.env.DEV ? '/api' : SYSTEM_MESSAGES.apiBaseUrl);
 
 const api = axios.create({
   baseURL: API_URL,

@@ -7,6 +7,7 @@ import { authService } from '../services/auth.service';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PageHeader from '../components/PageHeader';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 interface RegisterFormData {
   email: string;
@@ -65,7 +66,7 @@ const Register: React.FC = () => {
       <div className="flex-1">
         <PageHeader
           title="Create Your Account"
-          subtitle="Join Eventful to host, discover, and share unforgettable events."
+          subtitle={SYSTEM_MESSAGES.registerSubtitle}
           badge="Authentication"
         />
         <div className="max-w-md w-full mx-auto space-y-8 py-12 px-4 sm:px-6 lg:px-8\">

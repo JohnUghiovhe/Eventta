@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/eventful';
+const MONGODB_URI = process.env.MONGODB_URI || SYSTEM_MESSAGES.defaultMongoUri;
 
 export const connectDB = async (): Promise<void> => {
   try {

@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 type MessageAuthor = 'bot' | 'user';
 
@@ -25,7 +26,7 @@ const SupportChatbot: React.FC = () => {
     {
       id: 1,
       author: 'bot',
-      text: 'Hi! I am your Eventful support assistant. Ask me about tickets, payments, account access, or creating events.',
+      text: SYSTEM_MESSAGES.supportChatIntro,
       actions: [
         { label: 'Browse Events', route: '/events' },
         { label: 'Forgot Password', route: '/forgot-password' }
@@ -139,7 +140,7 @@ const SupportChatbot: React.FC = () => {
       {isOpen && (
         <div className="mb-3 w-[calc(100vw-2rem)] max-w-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Eventful Support</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{SYSTEM_MESSAGES.supportChatTitle}</h3>
             <button
               type="button"
               onClick={() => setIsOpen(false)}

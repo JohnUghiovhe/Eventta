@@ -5,6 +5,7 @@ import ticketRoutes from './ticket.routes';
 import paymentRoutes from './payment.routes';
 import analyticsRoutes from './analytics.routes';
 import notificationRoutes from './notification.routes';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 const router = Router();
 
@@ -12,7 +13,7 @@ const router = Router();
 router.get('/health', (_req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Eventful API is running',
+    message: SYSTEM_MESSAGES.apiRunning,
     timestamp: new Date().toISOString()
   });
 });

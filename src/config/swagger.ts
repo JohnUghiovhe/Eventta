@@ -1,11 +1,12 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import { config } from './environment';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 const renderExternalUrl = process.env.RENDER_EXTERNAL_URL;
 const apiBaseUrl = config.API_BASE_URL || renderExternalUrl;
 const localBaseUrl = `http://localhost:${config.PORT || 5000}`;
 const effectiveBaseUrl = apiBaseUrl || (config.NODE_ENV === 'production'
-  ? 'https://eventful-api.onrender.com'
+  ? SYSTEM_MESSAGES.defaultApiBaseUrl
   : localBaseUrl);
 
 const servers = [
@@ -18,7 +19,7 @@ const servers = [
 if (config.NODE_ENV !== 'production') {
   servers.push(
     {
-      url: 'https://eventful-api.onrender.com',
+      url: SYSTEM_MESSAGES.defaultApiBaseUrl,
       description: 'Production Server'
     },
     {
@@ -32,12 +33,12 @@ const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Eventful API Documentation',
+      title: SYSTEM_MESSAGES.apiDocumentationTitle,
       version: '1.0.0',
-      description: 'Comprehensive API documentation for Eventful - An event management and ticketing platform',
+      description: SYSTEM_MESSAGES.apiDocumentationDescription,
       contact: {
-        name: 'Eventful Support',
-        email: 'support@eventful.com'
+        name: SYSTEM_MESSAGES.supportName,
+        email: SYSTEM_MESSAGES.supportEmail
       },
       license: {
         name: 'MIT',

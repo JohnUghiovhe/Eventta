@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 dotenv.config();
 
@@ -8,7 +9,7 @@ export const config = {
   NODE_ENV: process.env.NODE_ENV || 'development',
 
   // Database
-  MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/eventful',
+  MONGODB_URI: process.env.MONGODB_URI || SYSTEM_MESSAGES.defaultMongoUri,
 
   // Redis
   REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
@@ -28,7 +29,7 @@ export const config = {
   EMAIL_SERVICE: process.env.EMAIL_SERVICE || 'gmail',
   EMAIL_USER: process.env.EMAIL_USER,
   EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
-  EMAIL_FROM: process.env.EMAIL_FROM || 'noreply@eventful.com',
+  EMAIL_FROM: process.env.EMAIL_FROM || SYSTEM_MESSAGES.defaultEmailFrom,
 
   // Frontend
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',

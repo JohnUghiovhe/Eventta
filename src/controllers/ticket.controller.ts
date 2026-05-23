@@ -7,6 +7,7 @@ import { NotificationService } from '../services/notification.service';
 import { QRCodeService } from '../services/qrcode.service';
 import { EmailService } from '../services/email.service';
 import { Logger } from '../utils/logger';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 import {
   calculateReminderDate,
   getPaginationParams,
@@ -569,7 +570,7 @@ export class TicketController {
       setImmediate(async () => {
         try {
           // Get organizer details
-          let organizerName = 'Eventful';
+          let organizerName: string = SYSTEM_MESSAGES.appName;
           if (event.creator) {
             const organizer = await User.findById(event.creator).select('firstName lastName');
             if (organizer) {

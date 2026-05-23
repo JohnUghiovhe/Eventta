@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 const Home: React.FC = () => {
   return (
@@ -26,7 +27,7 @@ const Home: React.FC = () => {
                 <div className="mt-6">
                   <div className="relative inline-block">
                     <div className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight hero-title">
-                      <span className="text-white">Eventful</span>
+                      <span className="text-white">{SYSTEM_MESSAGES.appName}</span>
                       <span className="block bg-gradient-to-r from-yellow-200 via-white to-yellow-200 bg-clip-text text-transparent">
                         feels electric.
                       </span>
@@ -114,7 +115,7 @@ const Home: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col gap-12">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-wide text-amber-600">Why Eventful</p>
+                <p className="text-sm font-semibold uppercase tracking-wide text-amber-600">{SYSTEM_MESSAGES.whyLabel}</p>
                 <h2 className="mt-3 text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white">
                   Designed for organizers and fans who move fast
                 </h2>
