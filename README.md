@@ -492,5 +492,3 @@ Estimated deployment time: **15-20 minutes**
 - The Node.js and TypeScript communities
 
 ---
-
-Built with ❤️ for Altschool Assessment
