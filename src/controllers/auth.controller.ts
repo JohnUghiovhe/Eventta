@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import User from '../models/User';
@@ -6,6 +6,8 @@ import { EmailService } from '../services/email.service';
 import { sanitizeUser } from '../utils/helpers';
 import { Logger } from '../utils/logger';
 import { AuthRequest } from '../types';
+import { AppError } from '../utils/errors';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 import dotenv from 'dotenv';
 import passport from 'passport';
 
@@ -18,52 +20,61 @@ export class AuthController {
   static async register(req: Request, res: Response): Promise<void> {
     try {
       const { email, password, firstName, lastName, role, phoneNumber } = req.body;
+      const normalizedEmail = String(email || '').trim().toLowerCase();
 
       // Check if user already exists
-      const existingUser = await User.findOne({ email });
+      const existingUser = await User.findOne({ email: normalizedEmail });
       if (existingUser) {
         res.status(409).json({
           success: false,
-          message: 'User with this email already exists'
+          message: SYSTEM_MESSAGES.auth.userExists
         });
         return;
       }
 
+      const verificationToken = crypto.randomBytes(32).toString('hex');
+      const hashedVerificationToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
+      const verificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
       // Create new user
       const user = await User.create({
-        email,
+        email: normalizedEmail,
         password,
         firstName,
         lastName,
         role,
-        phoneNumber
+        phoneNumber,
+        isEmailVerified: false,
+        emailVerificationToken: hashedVerificationToken,
+        emailVerificationExpires: verificationExpiry
       });
 
-      // Send welcome email (non-blocking)
-      EmailService.sendWelcomeEmail(email, firstName).catch((error) => {
-        Logger.error('Failed to send welcome email:', error);
-      });
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
 
-      // Generate JWT token
-      const token = jwt.sign(
-        { id: user._id.toString(), email: user.email, role: user.role },
-        JWT_SECRET as jwt.Secret,
-        { expiresIn: '7d' }
-      );
+      const verificationEmailSent = await EmailService.sendVerificationEmail(user.email, firstName, verificationUrl);
+      if (!verificationEmailSent) {
+        await User.findByIdAndDelete(user._id);
+        res.status(500).json({
+          success: false,
+          message: SYSTEM_MESSAGES.auth.verificationEmailFailed
+        });
+        return;
+      }
 
       res.status(201).json({
         success: true,
-        message: 'User registered successfully',
+        message: SYSTEM_MESSAGES.auth.registrationSuccess,
         data: {
           user: sanitizeUser(user),
-          token
+          verificationRequired: true
         }
       });
     } catch (error: any) {
       Logger.error('Registration error:', error);
       res.status(500).json({
         success: false,
-        message: 'Registration failed',
+        message: SYSTEM_MESSAGES.auth.registrationFailed,
         error: error.message
       });
     }
@@ -81,7 +92,7 @@ export class AuthController {
           Logger.error('Login error:', err);
           res.status(500).json({
             success: false,
-            message: 'Login failed'
+            message: SYSTEM_MESSAGES.auth.loginFailed
           });
           return resolve();
         }
@@ -90,7 +101,7 @@ export class AuthController {
           Logger.warn('Login failed - invalid credentials:', { email: req.body.email });
           res.status(401).json({
             success: false,
-            message: info?.message || 'Invalid credentials'
+            message: info?.message || SYSTEM_MESSAGES.auth.invalidCredentials
           });
           return resolve();
         }
@@ -102,7 +113,15 @@ export class AuthController {
             Logger.error('User document not found after authentication');
             res.status(500).json({
               success: false,
-              message: 'Login failed'
+              message: SYSTEM_MESSAGES.auth.loginFailed
+            });
+            return resolve();
+          }
+
+          if (!fullUser.isEmailVerified) {
+            res.status(403).json({
+              success: false,
+              message: SYSTEM_MESSAGES.auth.loginPendingVerification
             });
             return resolve();
           }
@@ -117,7 +136,7 @@ export class AuthController {
           Logger.info('Login successful:', { email: fullUser.email, id: fullUser._id });
           res.status(200).json({
             success: true,
-            message: 'Login successful',
+            message: SYSTEM_MESSAGES.auth.loginSuccessful,
             data: {
               user: sanitizeUser(fullUser),
               token
@@ -127,7 +146,7 @@ export class AuthController {
           Logger.error('Error fetching user after authentication:', error);
           res.status(500).json({
             success: false,
-            message: 'Login failed'
+            message: SYSTEM_MESSAGES.auth.loginFailed
           });
         }
         resolve();
@@ -146,7 +165,7 @@ export class AuthController {
       if (!user) {
         res.status(404).json({
           success: false,
-          message: 'No account found with this email address'
+          message: SYSTEM_MESSAGES.auth.accountNotFound
         });
         return;
       }
@@ -185,13 +204,13 @@ export class AuthController {
       // Respond immediately (non-blocking)
       res.status(200).json({
         success: true,
-        message: 'Password reset link sent to your email. Please check your inbox.'
+        message: SYSTEM_MESSAGES.auth.passwordResetLinkSent
       });
     } catch (error: any) {
       Logger.error('Forgot password error:', error);
       res.status(500).json({
         success: false,
-        message: 'Failed to process password reset request'
+        message: SYSTEM_MESSAGES.auth.passwordResetProcessFailed
       });
     }
   }
@@ -211,7 +230,7 @@ export class AuthController {
       if (!user) {
         res.status(400).json({
           success: false,
-          message: 'Invalid or expired reset token'
+          message: SYSTEM_MESSAGES.auth.invalidResetToken
         });
         return;
       }
@@ -223,14 +242,56 @@ export class AuthController {
 
       res.status(200).json({
         success: true,
-        message: 'Password reset successful. You can now log in with your new password.'
+        message: SYSTEM_MESSAGES.auth.passwordResetSuccessful
       });
     } catch (error: any) {
       Logger.error('Reset password error:', error);
       res.status(500).json({
         success: false,
-        message: 'Failed to reset password'
+        message: SYSTEM_MESSAGES.auth.passwordResetFailed
       });
+    }
+  }
+
+  /**
+   * Verify email address using token
+   */
+  static async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const token = String(req.body.token || req.query.token || '').trim();
+
+      if (!token) {
+        next(new AppError(400, SYSTEM_MESSAGES.auth.verificationTokenRequired));
+        return;
+      }
+
+      const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+      const user = await User.findOne({
+        emailVerificationToken: hashedToken,
+        emailVerificationExpires: { $gt: new Date() }
+      });
+
+      if (!user) {
+        next(new AppError(400, SYSTEM_MESSAGES.auth.verificationLinkInvalid));
+        return;
+      }
+
+      user.isEmailVerified = true;
+      user.emailVerificationToken = undefined;
+      user.emailVerificationExpires = undefined;
+      await user.save();
+
+      res.status(200).json({
+        success: true,
+        message: SYSTEM_MESSAGES.auth.verificationSuccess,
+        data: {
+          user: sanitizeUser(user)
+        }
+      });
+    } catch (error) {
+      Logger.error('Verify email error:', error);
+      next(new AppError(500, SYSTEM_MESSAGES.responses.internalServerError));
     }
   }
 
@@ -240,7 +301,7 @@ export class AuthController {
       if (!req.user) {
         res.status(401).json({
           success: false,
-          message: 'User not authenticated'
+          message: SYSTEM_MESSAGES.auth.profileNotAuthenticated
         });
         return;
       }
@@ -249,7 +310,7 @@ export class AuthController {
       if (!user) {
         res.status(404).json({
           success: false,
-          message: 'User not found'
+          message: SYSTEM_MESSAGES.auth.profileNotFound
         });
         return;
       }
@@ -262,7 +323,7 @@ export class AuthController {
       Logger.error('Get profile error:', error);
       res.status(500).json({
         success: false,
-        message: 'Failed to fetch profile'
+        message: SYSTEM_MESSAGES.auth.profileFetchFailed
       });
     }
   }
@@ -275,7 +336,7 @@ export class AuthController {
       if (!req.user) {
         res.status(401).json({
           success: false,
-          message: 'User not authenticated'
+          message: SYSTEM_MESSAGES.auth.profileNotAuthenticated
         });
         return;
       }
@@ -291,21 +352,21 @@ export class AuthController {
       if (!user) {
         res.status(404).json({
           success: false,
-          message: 'User not found'
+          message: SYSTEM_MESSAGES.auth.profileNotFound
         });
         return;
       }
 
       res.status(200).json({
         success: true,
-        message: 'Profile updated successfully',
+        message: SYSTEM_MESSAGES.auth.profileUpdateSuccess,
         data: sanitizeUser(user)
       });
     } catch (error: any) {
       Logger.error('Update profile error:', error);
       res.status(500).json({
         success: false,
-        message: 'Failed to update profile'
+        message: SYSTEM_MESSAGES.auth.profileUpdateFailed
       });
     }
   }

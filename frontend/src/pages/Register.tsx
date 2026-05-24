@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/auth.service';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -20,11 +19,10 @@ interface RegisterFormData {
 }
 
 const Register: React.FC = () => {
-  const navigate = useNavigate();
-  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [verificationNotice, setVerificationNotice] = useState<string | null>(null);
 
   const {
     register,
@@ -38,14 +36,15 @@ const Register: React.FC = () => {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       setLoading(true);
+      setVerificationNotice(null);
       const { confirmPassword, ...registerData } = data;
 
       const response = await authService.register(registerData);
 
-      if (response.success && response.data) {
-        login(response.data.token, response.data.user);
-        toast.success('Registration successful!');
-        navigate('/dashboard');
+      if (response.success) {
+        const message = response.message || SYSTEM_MESSAGES.mailboxCheckMessage;
+        setVerificationNotice(message);
+        toast.success(message);
       } else {
         toast.error(response.message || 'Registration failed');
       }
@@ -69,7 +68,17 @@ const Register: React.FC = () => {
           subtitle={SYSTEM_MESSAGES.registerSubtitle}
           badge="Authentication"
         />
-        <div className="max-w-md w-full mx-auto space-y-8 py-12 px-4 sm:px-6 lg:px-8\">
+        <div className="max-w-md w-full mx-auto space-y-8 py-12 px-4 sm:px-6 lg:px-8">
+          {verificationNotice && (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900/20 p-4 text-sm text-emerald-800 dark:text-emerald-200">
+              {verificationNotice}
+              <div className="mt-2">
+                <Link to="/login" className="font-semibold underline">
+                  Go to login
+                </Link>
+              </div>
+            </div>
+          )}
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
               Create your account

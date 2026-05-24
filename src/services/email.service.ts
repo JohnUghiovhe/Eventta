@@ -197,6 +197,24 @@ export class EmailService {
     });
   }
 
+  /**
+   * Send verification email
+   */
+  static async sendVerificationEmail(to: string, name: string, verificationUrl: string): Promise<boolean> {
+    return this.sendEmail({
+      to,
+      subject: SYSTEM_MESSAGES.email.verificationSubject,
+      html: `
+        <h1>Verify your email, ${name}!</h1>
+        <p>Thanks for signing up for ${SYSTEM_MESSAGES.appName}. Please confirm your email address to activate your account.</p>
+        <p><a href="${verificationUrl}">Verify your email address</a></p>
+        <p>If the button does not work, copy and paste this link into your browser:</p>
+        <p>${verificationUrl}</p>
+        <p>This verification link expires in 24 hours.</p>
+      `
+    });
+  }
+
 // Send password reset email
   static async sendPasswordResetEmail(to: string, resetUrl: string): Promise<boolean> {
     return this.sendEmail({

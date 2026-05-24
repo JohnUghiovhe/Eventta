@@ -52,6 +52,9 @@ export enum NotificationType {
 export interface IUser extends Document {
   email: string;
   password: string;
+  isEmailVerified?: boolean;
+  emailVerificationToken?: string;
+  emailVerificationExpires?: Date;
   passwordResetToken?: string;
   passwordResetExpires?: Date;
   firstName: string;

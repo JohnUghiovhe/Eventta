@@ -35,6 +35,7 @@ export enum ReminderPeriod {
 export interface User {
   _id: string;
   email: string;
+  isEmailVerified?: boolean;
   firstName: string;
   lastName: string;
   role: UserRole;

@@ -4,19 +4,27 @@ import { toast } from 'react-toastify';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../contexts/AuthContext';
+import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 const Dashboard: React.FC = () => {
   // Dashboard page component
   const { user, isCreator } = useAuth();
   const [searchParams] = useSearchParams();
   const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
+  const [showVerificationSuccess, setShowVerificationSuccess] = useState(false);
 
   useEffect(() => {
     // Check if coming from successful payment
     if (searchParams.get('paymentSuccess') === 'true') {
       setShowPaymentSuccess(true);
-      toast.success('🎉 Payment successful! Check your tickets below.');
+      toast.success(`🎉 ${SYSTEM_MESSAGES.dashboardPaymentSuccessToast}`);
       // Clear the query parameter from URL
+      window.history.replaceState({}, document.title, '/dashboard');
+    }
+
+    if (searchParams.get('verified') === 'true') {
+      setShowVerificationSuccess(true);
+      toast.success(`✅ ${SYSTEM_MESSAGES.dashboardVerificationToast}`);
       window.history.replaceState({}, document.title, '/dashboard');
     }
   }, [searchParams]);
@@ -97,6 +105,14 @@ const Dashboard: React.FC = () => {
             <div className="mb-6 p-4 bg-green-100 dark:bg-green-900/20 border border-green-400 dark:border-green-700 rounded-lg">
               <p className="text-green-800 dark:text-green-200">
                 ✅ Your ticket has been issued successfully! Go to "My Tickets" to view your purchased ticket.
+              </p>
+            </div>
+          )}
+
+          {showVerificationSuccess && (
+            <div className="mb-6 p-4 bg-blue-100 dark:bg-blue-900/20 border border-blue-400 dark:border-blue-700 rounded-lg">
+              <p className="text-blue-800 dark:text-blue-200">
+                ✅ {SYSTEM_MESSAGES.dashboardVerificationBanner}
               </p>
             </div>
           )}

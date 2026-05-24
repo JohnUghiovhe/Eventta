@@ -228,6 +228,8 @@ router.post('/forgot-password', authLimiter, validateForgotPassword, AuthControl
  */
 router.post('/reset-password', authLimiter, validateResetPassword, AuthController.resetPassword);
 
+router.post('/verify-email', authLimiter, AuthController.verifyEmail);
+
 /**
  * @swagger
  * /api/auth/profile:

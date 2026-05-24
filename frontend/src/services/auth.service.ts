@@ -24,19 +24,33 @@ interface ResetPasswordData {
   password: string;
 }
 
-interface AuthResponse {
+interface LoginResponse {
   user: User;
   token: string;
 }
 
+interface RegisterResponse {
+  user: User;
+  verificationRequired?: boolean;
+}
+
+interface VerifyEmailData {
+  token: string;
+}
+
 export const authService = {
-  async register(data: RegisterData): Promise<ApiResponse<AuthResponse>> {
+  async register(data: RegisterData): Promise<ApiResponse<RegisterResponse>> {
     const response = await api.post('/auth/register', data);
     return response.data;
   },
 
-  async login(data: LoginData): Promise<ApiResponse<AuthResponse>> {
+  async login(data: LoginData): Promise<ApiResponse<LoginResponse>> {
     const response = await api.post('/auth/login', data);
+    return response.data;
+  },
+
+  async verifyEmail(data: VerifyEmailData): Promise<ApiResponse<{ user: User }>> {
+    const response = await api.post('/auth/verify-email', data);
     return response.data;
   },
 
