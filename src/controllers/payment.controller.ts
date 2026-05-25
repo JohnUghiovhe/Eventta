@@ -131,7 +131,7 @@ export class PaymentController {
           accessCode: paystackResponse.data.access_code
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Initialize payment error:', error);
       res.status(500).json({
         success: false,
@@ -320,7 +320,7 @@ export class PaymentController {
           ticket
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Verify payment error:', error);
       console.error('Verify payment error details:', {
         message: error.message,
@@ -366,7 +366,7 @@ export class PaymentController {
           status: payment.status
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get payment status error:', error);
       res.status(500).json({
         success: false,
@@ -389,7 +389,7 @@ export class PaymentController {
         success: true,
         data: payments
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get my payments error:', error);
       res.status(500).json({
         success: false,
@@ -436,7 +436,7 @@ export class PaymentController {
           totalTransactions: payments.length
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get event payments error:', error);
       res.status(500).json({
         success: false,
@@ -618,7 +618,7 @@ export class PaymentController {
           }
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Initialize demo payment error:', error);
       res.status(500).json({
         success: false,
@@ -628,3 +628,4 @@ export class PaymentController {
     }
   }
 }
+

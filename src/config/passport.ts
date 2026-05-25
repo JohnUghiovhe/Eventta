@@ -16,7 +16,7 @@ passport.use(
       usernameField: 'email',
       passwordField: 'password'
     },
-    async (email: string, password: string, done: any) => {
+    async (email: string, password: string, done) => {
       try {
         Logger.info('LocalStrategy authenticating:', { email });
         
@@ -36,10 +36,7 @@ passport.use(
         return done(null, { 
           id: user._id.toString(), 
           email: user.email, 
-          role: user.role,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          _id: user._id.toString()
+          role: user.role
         });
       } catch (error) {
         Logger.error('LocalStrategy error:', error);
@@ -56,7 +53,7 @@ const jwtOptions: StrategyOptions = {
 };
 
 passport.use(
-  new JwtStrategy(jwtOptions, async (payload: any, done: any) => {
+  new JwtStrategy(jwtOptions, async (payload: { id?: string; userId?: string }, done) => {
     try {
       const userId = payload.id || payload.userId;
       if (!userId) {

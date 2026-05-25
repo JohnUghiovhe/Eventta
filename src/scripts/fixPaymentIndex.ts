@@ -23,7 +23,7 @@ export const fixPaymentIndex = async () => {
     }
 
     Logger.info('Payment indexes have been fixed');
-  } catch (error: any) {
+  } catch (error: unknown) {
     // It's okay if the index doesn't exist
     if (error.message.includes('index not found') || error.message.includes('does not exist')) {
       Logger.info('Problematic index does not exist or was already removed');
@@ -32,3 +32,4 @@ export const fixPaymentIndex = async () => {
     }
   }
 };
+

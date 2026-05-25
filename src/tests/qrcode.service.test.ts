@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@jest/globals';
 import { QRCodeService } from '../services/qrcode.service';
 
 describe('QRCodeService', () => {

@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@jest/globals';
 import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 describe('SYSTEM_MESSAGES', () => {

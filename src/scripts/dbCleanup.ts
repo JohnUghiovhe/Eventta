@@ -58,10 +58,11 @@ const cleanup = async () => {
 
     Logger.info('Database cleanup completed successfully!');
     process.exit(0);
-  } catch (error: any) {
+  } catch (error: unknown) {
     Logger.error('Database cleanup failed:', error);
     process.exit(1);
   }
 };
 
 cleanup();
+

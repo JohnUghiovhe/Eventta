@@ -45,7 +45,7 @@ export class TicketController {
           }
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get my tickets error:', error);
       res.status(500).json({
         success: false,
@@ -78,7 +78,7 @@ export class TicketController {
         success: true,
         data: ticket
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get ticket error:', error);
       res.status(500).json({
         success: false,
@@ -156,7 +156,7 @@ export class TicketController {
           valid: true
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Verify ticket error:', error);
       res.status(500).json({
         success: false,
@@ -216,7 +216,7 @@ export class TicketController {
         message: 'Ticket scanned successfully',
         data: ticket
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Scan ticket error:', error);
       res.status(500).json({
         success: false,
@@ -261,7 +261,7 @@ export class TicketController {
         message: 'Reminder updated successfully',
         data: ticket
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Update reminder error:', error);
       res.status(500).json({
         success: false,
@@ -302,7 +302,7 @@ export class TicketController {
           attendees: tickets
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get event attendees error:', error);
       res.status(500).json({
         success: false,
@@ -375,7 +375,7 @@ export class TicketController {
         message: 'Ticket verified',
         data: ticket
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Verify ticket for event error:', error);
       res.status(500).json({
         success: false,
@@ -425,7 +425,7 @@ export class TicketController {
         message: 'Ticket marked as used',
         data: ticket
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Mark ticket as used error:', error);
       res.status(500).json({
         success: false,
@@ -619,7 +619,7 @@ export class TicketController {
         message: 'Free ticket claimed successfully',
         data: { ticket: populatedTicket }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Claim free ticket error:', error);
       res.status(500).json({
         success: false,
@@ -629,3 +629,4 @@ export class TicketController {
     }
   }
 }
+

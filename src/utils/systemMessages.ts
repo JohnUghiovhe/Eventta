@@ -28,7 +28,6 @@ export const SYSTEM_MESSAGES = {
     loginFailed: 'Login failed',
     loginSuccessful: 'Login successful',
     loginPendingVerification: 'Please verify your email address before logging in. Check your mailbox for the verification link.',
-    accountNotFound: 'No account found with this email address',
     passwordResetLinkSent: 'Password reset link sent to your email. Please check your inbox.',
     passwordResetProcessFailed: 'Failed to process password reset request',
     invalidResetToken: 'Invalid or expired reset token',

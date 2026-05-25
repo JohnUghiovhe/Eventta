@@ -42,8 +42,8 @@ export const buildErrorResponse = (error: AppError | Error | unknown): Normalize
   }
 
   if (error && typeof error === 'object') {
-    const typedError = error as Record<string, any>;
-    const errorName = typedError.name as string | undefined;
+    const typedError = error as Record<string, unknown>;
+    const errorName = typeof typedError.name === 'string' ? typedError.name : undefined;
 
     if (errorName === 'ValidationError') {
       return {

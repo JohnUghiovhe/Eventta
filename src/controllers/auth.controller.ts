@@ -14,6 +14,8 @@ import passport from 'passport';
 dotenv.config();
 
 const JWT_SECRET: string = process.env.JWT_SECRET || 'your-secret-key';
+const getErrorMessage = (error: unknown): string =>
+  error instanceof Error ? error.message : 'Unknown error';
 
 export class AuthController {
 //  Register a new user
@@ -70,12 +72,12 @@ export class AuthController {
           verificationRequired: true
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Registration error:', error);
       res.status(500).json({
         success: false,
         message: SYSTEM_MESSAGES.auth.registrationFailed,
-        error: error.message
+        error: getErrorMessage(error)
       });
     }
   }
@@ -87,7 +89,11 @@ export class AuthController {
     Logger.info('Login attempt:', { email: req.body.email });
     
     return new Promise<void>((resolve) => {
-      passport.authenticate('local', { session: false }, async (err: any, user: any, info: any) => {
+      passport.authenticate('local', { session: false }, async (
+        err: unknown,
+        user: Express.User | false | null,
+        info: { message?: string } | undefined
+      ) => {
         if (err) {
           Logger.error('Login error:', err);
           res.status(500).json({
@@ -163,9 +169,9 @@ export class AuthController {
       const user = await User.findOne({ email: normalizedEmail });
 
       if (!user) {
-        res.status(404).json({
-          success: false,
-          message: SYSTEM_MESSAGES.auth.accountNotFound
+        res.status(200).json({
+          success: true,
+          message: SYSTEM_MESSAGES.auth.passwordResetLinkSent
         });
         return;
       }
@@ -180,33 +186,28 @@ export class AuthController {
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
       const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
-      // Send email asynchronously (non-blocking) with automatic rollback on failure
-      EmailService.sendPasswordResetEmail(user.email, resetUrl)
-        .then((emailSent) => {
-          if (!emailSent) {
-            Logger.warn(`Password reset email failed to send for user ${user.email}. Token will expire in 1 hour.`);
-            // Rollback token if email send fails
-            user.passwordResetToken = undefined;
-            user.passwordResetExpires = undefined;
-            user.save().catch((err) => Logger.error('Failed to rollback reset token:', err));
-          } else {
-            Logger.info(`Password reset email sent successfully to ${user.email}`);
-          }
-        })
-        .catch((error) => {
-          Logger.error(`Error sending password reset email to ${user.email}:`, error);
-          // Rollback token on any error
-          user.passwordResetToken = undefined;
-          user.passwordResetExpires = undefined;
-          user.save().catch((err) => Logger.error('Failed to rollback reset token:', err));
-        });
+      const emailSent = await EmailService.sendPasswordResetEmail(user.email, resetUrl);
 
-      // Respond immediately (non-blocking)
+      if (!emailSent) {
+        Logger.warn(`Password reset email failed to send for user ${user.email}. Rolling back reset token.`);
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save();
+
+        res.status(500).json({
+          success: false,
+          message: SYSTEM_MESSAGES.auth.passwordResetProcessFailed
+        });
+        return;
+      }
+
+      Logger.info(`Password reset email sent successfully to ${user.email}`);
+
       res.status(200).json({
         success: true,
         message: SYSTEM_MESSAGES.auth.passwordResetLinkSent
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Forgot password error:', error);
       res.status(500).json({
         success: false,
@@ -244,7 +245,7 @@ export class AuthController {
         success: true,
         message: SYSTEM_MESSAGES.auth.passwordResetSuccessful
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Reset password error:', error);
       res.status(500).json({
         success: false,
@@ -319,7 +320,7 @@ export class AuthController {
         success: true,
         data: sanitizeUser(user)
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get profile error:', error);
       res.status(500).json({
         success: false,
@@ -362,7 +363,7 @@ export class AuthController {
         message: SYSTEM_MESSAGES.auth.profileUpdateSuccess,
         data: sanitizeUser(user)
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Update profile error:', error);
       res.status(500).json({
         success: false,

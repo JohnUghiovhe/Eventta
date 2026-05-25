@@ -7,7 +7,7 @@ export const authenticate = (
   res: Response,
   next: NextFunction
 ): void => {
-  passport.authenticate('jwt', { session: false }, (err: any, user: any) => {
+  passport.authenticate('jwt', { session: false }, (err: unknown, user: Express.User | false | null) => {
     if (err) {
       res.status(500).json({ success: false, message: 'Authentication error' });
       return;

@@ -2,13 +2,13 @@ import { Response } from 'express';
 import { SYSTEM_MESSAGES } from './systemMessages';
 
 export const res = {
-  ok: (res: Response, code = 200, msg = SYSTEM_MESSAGES.responses.success, data?: any) => 
+  ok: <T = unknown>(res: Response, code = 200, msg = SYSTEM_MESSAGES.responses.success, data?: T) => 
     res.status(code).json({ status: 'success', message: msg, ...(data && { data }) }),
   
   err: (res: Response, code = 400, msg = SYSTEM_MESSAGES.responses.error) => 
     res.status(code).json({ status: 'error', message: msg }),
   
-  created: (res: Response, msg = SYSTEM_MESSAGES.responses.created, data?: any) =>
+  created: <T = unknown>(res: Response, msg = SYSTEM_MESSAGES.responses.created, data?: T) =>
     res.status(201).json({ status: 'success', message: msg, ...(data && { data }) }),
   
   unauthorized: (res: Response, msg = SYSTEM_MESSAGES.responses.unauthorized) =>

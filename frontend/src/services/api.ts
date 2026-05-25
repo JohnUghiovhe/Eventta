@@ -13,6 +13,19 @@ const api = axios.create({
   },
 });
 
+const PUBLIC_AUTH_ENDPOINTS = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+  '/auth/verify-email',
+];
+
+const isPublicAuthEndpoint = (url?: string): boolean => {
+  if (!url) return false;
+  return PUBLIC_AUTH_ENDPOINTS.some((endpoint) => url.includes(endpoint));
+};
+
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
@@ -26,7 +39,7 @@ api.interceptors.request.use(
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         // Redirect to login if on a protected route
-        if (config.url && !config.url.includes('/auth/login') && !config.url.includes('/auth/register')) {
+        if (!isPublicAuthEndpoint(config.url)) {
           window.location.href = '/login';
         }
       } else {
@@ -57,7 +70,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       const requestUrl = error.config?.url || '';
       const isPublicVerify = requestUrl.includes('/payments/verify-public');
-      const isAuthEndpoint = requestUrl.includes('/auth/login') || requestUrl.includes('/auth/register');
+      const isAuthEndpoint = isPublicAuthEndpoint(requestUrl);
 
       if (!isPublicVerify && !isAuthEndpoint) {
         console.warn('Unauthorized access, clearing auth and redirecting to login');

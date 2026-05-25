@@ -88,7 +88,7 @@ export class PaymentService {
 
       Logger.info(`Payment initialized for ${email}: ${reference}`);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Paystack initialization failed:', error.response?.data || error.message);
       throw new Error(
         error.response?.data?.message || 'Failed to initialize payment'
@@ -130,7 +130,7 @@ export class PaymentService {
       );
 
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Paystack verification failed:', error.response?.data || error);
       throw new Error(
         error.response?.data?.message || 'Failed to verify payment'
@@ -151,7 +151,7 @@ export class PaymentService {
       );
 
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Failed to fetch payment details:', error.response?.data || error);
       throw new Error('Failed to fetch payment details');
     }
@@ -171,9 +171,10 @@ export class PaymentService {
       });
 
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Failed to list transactions:', error.response?.data || error);
       throw new Error('Failed to list transactions');
     }
   }
 }
+

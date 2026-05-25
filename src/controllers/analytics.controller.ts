@@ -53,7 +53,7 @@ export class AnalyticsController {
           averageRevenuePerEvent: totalEvents > 0 ? totalRevenue / totalEvents : 0
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get overall analytics error:', error);
       res.status(500).json({
         success: false,
@@ -104,7 +104,7 @@ export class AnalyticsController {
         success: true,
         data: eventAnalytics
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get events analytics error:', error);
       res.status(500).json({
         success: false,
@@ -201,7 +201,7 @@ export class AnalyticsController {
           dailySales
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get event analytics error:', error);
       res.status(500).json({
         success: false,
@@ -210,3 +210,4 @@ export class AnalyticsController {
     }
   }
 }
+

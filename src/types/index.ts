@@ -123,8 +123,8 @@ export interface IPayment extends Document {
   status: PaymentStatus;
   paystackReference: string;
   paystackAuthorizationUrl?: string;
-  paystackResponse?: any;
-  metadata?: any;
+  paystackResponse?: unknown;
+  metadata?: unknown;
   refundedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -150,7 +150,7 @@ export interface INotification extends Document {
     eventId?: string;
     ticketId?: string;
     paymentId?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   read: boolean;
   readAt?: Date;
@@ -187,7 +187,7 @@ export interface PaginationParams {
   order?: 'asc' | 'desc';
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
   data?: T;

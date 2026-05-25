@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@jest/globals';
 import User from '../models/User';
 import { UserRole } from '../types';
 
@@ -66,7 +67,7 @@ describe('User Model', () => {
         password: 'password123',
         firstName: 'John',
         lastName: 'Doe',
-        role: 'invalid_role' as any
+        role: 'invalid_role' as unknown as UserRole
       });
 
       const error = user.validateSync();

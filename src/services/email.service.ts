@@ -166,7 +166,7 @@ export class EmailService {
           await transporter.sendMail(mailOptions);
           Logger.info(`Email sent to ${options.to} via transport ${index + 1}`);
           return true;
-        } catch (error: any) {
+        } catch (error: unknown) {
           lastError = error;
           Logger.warn(
             `Email send attempt ${index + 1}/${transporters.length} failed on ${EMAIL_HOST}:${port} - ${error?.message || 'Unknown error'}`
@@ -449,3 +449,4 @@ export class EmailService {
     });
   }
 }
+

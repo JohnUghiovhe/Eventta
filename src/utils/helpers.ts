@@ -50,8 +50,14 @@ export const getReminderLabel = (reminderPeriod: ReminderPeriod): string => {
   return labels[reminderPeriod];
 };
 
-export const sanitizeUser = (user: any) => {
-  const { password, ...sanitized } = user.toObject ? user.toObject() : user;
+type UserWithOptionalToObject = {
+  password?: unknown;
+  toObject?: () => Record<string, unknown>;
+};
+
+export const sanitizeUser = (user: UserWithOptionalToObject): Record<string, unknown> => {
+  const source = user.toObject ? user.toObject() : (user as Record<string, unknown>);
+  const { password, ...sanitized } = source;
   return sanitized;
 };
 

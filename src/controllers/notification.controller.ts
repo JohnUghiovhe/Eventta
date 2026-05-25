@@ -39,7 +39,7 @@ export class NotificationController {
         message: 'Notification created successfully',
         data: notification
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Create notification error:', error);
       res.status(500).json({
         success: false,
@@ -87,7 +87,7 @@ export class NotificationController {
           }
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get notifications error:', error);
       res.status(500).json({
         success: false,
@@ -112,7 +112,7 @@ export class NotificationController {
           unreadCount
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get unread count error:', error);
       res.status(500).json({
         success: false,
@@ -145,7 +145,7 @@ export class NotificationController {
         success: true,
         data: notification
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get notification by ID error:', error);
       res.status(500).json({
         success: false,
@@ -180,7 +180,7 @@ export class NotificationController {
         message: 'Notification marked as read',
         data: notification
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Mark as read error:', error);
       res.status(500).json({
         success: false,
@@ -206,7 +206,7 @@ export class NotificationController {
           modifiedCount: result.modifiedCount
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Mark all as read error:', error);
       res.status(500).json({
         success: false,
@@ -239,7 +239,7 @@ export class NotificationController {
         success: true,
         message: 'Notification deleted successfully'
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Delete notification error:', error);
       res.status(500).json({
         success: false,
@@ -262,7 +262,7 @@ export class NotificationController {
           deletedCount: result.deletedCount
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Delete all notifications error:', error);
       res.status(500).json({
         success: false,
@@ -271,3 +271,4 @@ export class NotificationController {
     }
   }
 }
+

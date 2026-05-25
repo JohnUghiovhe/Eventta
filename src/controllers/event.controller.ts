@@ -28,7 +28,7 @@ export class EventController {
         message: 'Event created successfully',
         data: event
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Create event error:', error);
       res.status(500).json({
         success: false,
@@ -95,7 +95,7 @@ export class EventController {
       await setCache(cacheKey, JSON.stringify(response), 300);
 
       res.status(200).json(response);
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get all events error:', error);
       res.status(500).json({
         success: false,
@@ -142,7 +142,7 @@ export class EventController {
       await setCache(cacheKey, JSON.stringify(response), 600);
 
       res.status(200).json(response);
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get event error:', error);
       res.status(500).json({
         success: false,
@@ -182,7 +182,7 @@ export class EventController {
           }
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get my events error:', error);
       res.status(500).json({
         success: false,
@@ -222,7 +222,7 @@ export class EventController {
         message: 'Event updated successfully',
         data: event
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Update event error:', error);
       res.status(500).json({
         success: false,
@@ -257,7 +257,7 @@ export class EventController {
         success: true,
         message: 'Event deleted successfully'
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Delete event error:', error);
       res.status(500).json({
         success: false,
@@ -307,7 +307,7 @@ export class EventController {
         message: 'Event status updated successfully',
         data: event
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Update event status error:', error);
       res.status(500).json({
         success: false,
@@ -343,7 +343,7 @@ export class EventController {
           shareLinks
         }
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Logger.error('Get share links error:', error);
       res.status(500).json({
         success: false,
@@ -352,3 +352,4 @@ export class EventController {
     }
   }
 }
+

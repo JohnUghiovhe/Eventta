@@ -102,8 +102,8 @@ export interface Payment {
   currency: string;
   status: PaymentStatus;
   paystackReference: string;
-  paystackResponse?: any;
-  metadata?: any;
+  paystackResponse?: unknown;
+  metadata?: unknown;
   createdAt: string;
   updatedAt: string;
 }
@@ -130,7 +130,7 @@ export interface EventAnalytics {
   attendanceRate: number;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
   data?: T;

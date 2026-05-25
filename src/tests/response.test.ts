@@ -1,12 +1,13 @@
+import { describe, expect, it, jest } from '@jest/globals';
 import { Response } from 'express';
 import { res } from '../utils/response';
 import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 
 const createResponse = (): Pick<Response, 'status' | 'json'> => {
-  const response = {} as Response;
-  response.status = jest.fn().mockReturnValue(response);
-  response.json = jest.fn().mockReturnValue(response);
-  return response;
+  const response: Record<string, unknown> = {};
+  response.status = jest.fn().mockReturnValue(response) as unknown as Response['status'];
+  response.json = jest.fn().mockReturnValue(response) as unknown as Response['json'];
+  return response as Pick<Response, 'status' | 'json'>;
 };
 
 describe('response helper', () => {
