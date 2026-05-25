@@ -6,7 +6,7 @@ import Event from '../models/Event';
 import Ticket from '../models/Ticket';
 import { EmailService } from './email.service';
 import { Logger } from '../utils/logger';
-import { NotificationType } from '../types';
+import { NotificationType, IUser, IEvent, ITicket, IReminder } from '../types';
 
 export class NotificationService {
 //  Start the notification scheduler
@@ -55,10 +55,10 @@ export class NotificationService {
   }
 
   // Send a single reminder
-  static async sendReminder(reminder: any): Promise<'sent' | 'skipped'> {
-    const user = await this.resolveUser(reminder.user);
-    const event = await this.resolveEvent(reminder.event);
-    const ticket = await this.resolveTicket(reminder.ticket);
+  static async sendReminder(reminder: IReminder): Promise<'sent' | 'skipped'> {
+    const user = await this.resolveUser(reminder.user as string | IUser);
+    const event = await this.resolveEvent(reminder.event as string | IEvent);
+    const ticket = await this.resolveTicket(reminder.ticket as string | ITicket);
 
     if (!user || !event || !ticket) {
       Logger.warn(
@@ -83,21 +83,21 @@ export class NotificationService {
     return 'sent';
   }
 
-  private static async resolveUser(userRef: any): Promise<any> {
+  private static async resolveUser(userRef: string | IUser | null): Promise<IUser | null> {
     if (!userRef) return null;
-    if (typeof userRef === 'object' && userRef.email) return userRef;
+    if (typeof userRef === 'object' && (userRef as IUser).email) return userRef as IUser;
     return User.findById(String(userRef));
   }
 
-  private static async resolveEvent(eventRef: any): Promise<any> {
+  private static async resolveEvent(eventRef: string | IEvent | null): Promise<IEvent | null> {
     if (!eventRef) return null;
-    if (typeof eventRef === 'object' && eventRef.title) return eventRef;
+    if (typeof eventRef === 'object' && (eventRef as IEvent).title) return eventRef as IEvent;
     return Event.findById(String(eventRef));
   }
 
-  private static async resolveTicket(ticketRef: any): Promise<any> {
+  private static async resolveTicket(ticketRef: string | ITicket | null): Promise<ITicket | null> {
     if (!ticketRef) return null;
-    if (typeof ticketRef === 'object' && ticketRef.ticketNumber) return ticketRef;
+    if (typeof ticketRef === 'object' && (ticketRef as ITicket).ticketNumber) return ticketRef as ITicket;
     return Ticket.findById(String(ticketRef));
   }
 
@@ -155,7 +155,7 @@ export class NotificationService {
     title: string,
     message: string,
     type: NotificationType,
-    data?: any
+    data?: Record<string, unknown>
   ): Promise<void> {
     try {
       await Notification.create({

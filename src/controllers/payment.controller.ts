@@ -3,7 +3,7 @@ import Payment from '../models/Payment';
 import Ticket from '../models/Ticket';
 import Event from '../models/Event';
 import User from '../models/User';
-import { AuthRequest, PaymentStatus, TicketStatus } from '../types';
+import { AuthRequest, PaymentStatus, TicketStatus, IPayment, ITicket, IEvent } from '../types';
 import { PaymentService } from '../services/payment.service';
 import { QRCodeService } from '../services/qrcode.service';
 import { EmailService } from '../services/email.service';
@@ -87,7 +87,7 @@ export class PaymentController {
       const ticketNumber = generateTicketNumber();
 
       // Create payment record
-      const payment: any = await Payment.create({
+      const payment = (await Payment.create({
         reference,
         user: user._id.toString(),
         event: event._id.toString(),
@@ -99,7 +99,7 @@ export class PaymentController {
           ticketNumber,
           reminder: reminder || event.defaultReminder
         }
-      });
+      })) as IPayment;
 
       Logger.info(`Payment record created with reference ${reference}`, { paymentId: payment._id });
 
@@ -132,11 +132,12 @@ export class PaymentController {
         }
       });
     } catch (error: unknown) {
+      const err = error as Error;
       Logger.error('Initialize payment error:', error);
       res.status(500).json({
         success: false,
-        message: error.message || 'Failed to initialize payment. Please try again.',
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        message: err?.message || 'Failed to initialize payment. Please try again.',
+        error: process.env.NODE_ENV === 'development' ? err?.message : undefined
       });
     }
   }
@@ -161,7 +162,7 @@ export class PaymentController {
       // Check if already verified
       if (payment.status === PaymentStatus.SUCCESS) {
         try {
-          const ticket = await Ticket.findOne({ payment: payment._id.toString() } as any)
+          const ticket = await Ticket.findOne({ payment: payment._id.toString() })
             .populate('event')
             .populate('user', 'firstName lastName email');
           
@@ -201,12 +202,16 @@ export class PaymentController {
       await payment.save();
 
       // Get event and user
-      const event: any = payment.event;
+      const event = payment.event as unknown as IEvent;
+      const paymentMeta = (payment.metadata || {}) as { ticketNumber?: string; reminder?: string | undefined; [key: string]: any };
       const user = await User.findById(payment.user);
+
+      const metadata = (payment.metadata || {}) as Record<string, unknown>;
+      const ticketNumberFromMeta = String(metadata.ticketNumber || paymentMeta.ticketNumber || generateTicketNumber());
 
       // Generate QR code
       const qrCodeData = {
-        ticketNumber: payment.metadata.ticketNumber,
+        ticketNumber: ticketNumberFromMeta,
         eventId: event._id.toString(),
         userId: payment.user.toString(),
         eventTitle: event.title
@@ -215,30 +220,30 @@ export class PaymentController {
       const qrCode = await QRCodeService.generateQRCode(qrCodeData);
 
       // Check if ticket already exists (race condition prevention)
-      let ticket: any = await Ticket.findOne({
-        ticketNumber: payment.metadata.ticketNumber
+      let ticket: ITicket | null = await Ticket.findOne({
+        ticketNumber: ticketNumberFromMeta
       });
 
       let isNewTicket = false;
 
       // Create ticket only if it doesn't exist
       if (!ticket) {
-        ticket = await Ticket.create({
-          ticketNumber: payment.metadata.ticketNumber,
-          event: event._id,
-          user: payment.user,
+        ticket = (await Ticket.create({
+          ticketNumber: paymentMeta.ticketNumber,
+          event: event._id.toString(),
+          user: payment.user.toString(),
           qrCode,
           qrCodeData: JSON.stringify(qrCodeData),
           status: TicketStatus.PAID,
           price: payment.amount,
           payment: payment._id.toString(),
-          reminder: payment.metadata.reminder || event.defaultReminder
-        });
+          reminder: paymentMeta.reminder || event.defaultReminder
+        })) as ITicket;
 
         isNewTicket = true;
-        Logger.info(`Ticket created: ${payment.metadata.ticketNumber}`, { ticketId: ticket._id });
+        Logger.info(`Ticket created: ${paymentMeta.ticketNumber}`, { ticketId: ticket._id });
       } else {
-        Logger.info(`Ticket already exists: ${payment.metadata.ticketNumber}`, { ticketId: ticket._id });
+        Logger.info(`Ticket already exists: ${paymentMeta.ticketNumber}`, { ticketId: ticket._id });
       }
 
       // Refetch ticket with populated event and user data
@@ -247,8 +252,12 @@ export class PaymentController {
         .populate('user', 'firstName lastName email');
 
       // Update payment with ticket reference (if not already set)
+      if (!ticket) {
+        throw new Error('Ticket not found after creation');
+      }
+
       if (!payment.ticket || payment.ticket.toString() !== ticket._id.toString()) {
-        payment.ticket = ticket._id;
+        payment.ticket = ticket._id.toString();
         await payment.save();
       }
 
@@ -278,8 +287,9 @@ export class PaymentController {
           try {
             // Get organizer details for email
             let organizerName: string = SYSTEM_MESSAGES.appName;
-            if (event.organizer) {
-              const organizer = await User.findById(event.organizer);
+            // Use event.creator as organizer reference
+            if (event.creator) {
+              const organizer = await User.findById(event.creator);
               if (organizer) {
                 organizerName = `${organizer.firstName} ${organizer.lastName}`;
               }
@@ -321,16 +331,17 @@ export class PaymentController {
         }
       });
     } catch (error: unknown) {
+      const err = error as Error;
       Logger.error('Verify payment error:', error);
-      console.error('Verify payment error details:', {
-        message: error.message,
-        stack: error.stack,
+      Logger.debug('Verify payment error details:', {
+        message: err?.message,
+        stack: (err as any)?.stack,
         reference: req.body.reference
       });
       res.status(500).json({
         success: false,
-        message: error.message || 'Failed to verify payment',
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        message: err?.message || 'Failed to verify payment',
+        error: process.env.NODE_ENV === 'development' ? err?.message : undefined
       });
     }
   }
@@ -353,7 +364,7 @@ export class PaymentController {
 
       let ticket = null;
       if (payment.status === PaymentStatus.SUCCESS) {
-        ticket = await Ticket.findOne({ payment: payment._id.toString() } as any)
+        ticket = await Ticket.findOne({ payment: payment._id.toString() })
           .populate('event')
           .populate('user', 'firstName lastName email');
       }
@@ -619,11 +630,12 @@ export class PaymentController {
         }
       });
     } catch (error: unknown) {
+      const err = error as Error;
       Logger.error('Initialize demo payment error:', error);
       res.status(500).json({
         success: false,
-        message: error.message || 'Failed to initialize demo payment. Please try again.',
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        message: err?.message || 'Failed to initialize demo payment. Please try again.',
+        error: process.env.NODE_ENV === 'development' ? err?.message : undefined
       });
     }
   }

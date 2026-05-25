@@ -39,7 +39,7 @@ export interface PaystackVerifyResponse {
     customer: {
       email: string;
     };
-    metadata?: any;
+    metadata?: Record<string, unknown>;
   };
 }
 
@@ -51,7 +51,7 @@ export class PaymentService {
     email: string,
     amount: number,
     reference: string,
-    metadata?: any
+    metadata?: Record<string, unknown>
   ): Promise<PaystackInitializeResponse> {
     try {
       // Check if Paystack is configured
@@ -89,10 +89,9 @@ export class PaymentService {
       Logger.info(`Payment initialized for ${email}: ${reference}`);
       return response.data;
     } catch (error: unknown) {
-      Logger.error('Paystack initialization failed:', error.response?.data || error.message);
-      throw new Error(
-        error.response?.data?.message || 'Failed to initialize payment'
-      );
+      const err = error as any;
+      Logger.error('Paystack initialization failed:', err?.response?.data || err?.message || err);
+      throw new Error(err?.response?.data?.message || err?.message || 'Failed to initialize payment');
     }
   }
 
@@ -131,15 +130,14 @@ export class PaymentService {
 
       return response.data;
     } catch (error: unknown) {
-      Logger.error('Paystack verification failed:', error.response?.data || error);
-      throw new Error(
-        error.response?.data?.message || 'Failed to verify payment'
-      );
+      const err = error as any;
+      Logger.error('Paystack verification failed:', err?.response?.data || err);
+      throw new Error(err?.response?.data?.message || err?.message || 'Failed to verify payment');
     }
   }
 
   // Get payment details
-  static async getPaymentDetails(reference: string): Promise<any> {
+  static async getPaymentDetails(reference: string): Promise<PaystackVerifyResponse> {
     try {
       const response = await axios.get(
         `${PAYSTACK_BASE_URL}/transaction/${reference}`,
@@ -152,15 +150,16 @@ export class PaymentService {
 
       return response.data;
     } catch (error: unknown) {
-      Logger.error('Failed to fetch payment details:', error.response?.data || error);
-      throw new Error('Failed to fetch payment details');
+      const err = error as any;
+      Logger.error('Failed to fetch payment details:', err?.response?.data || err);
+      throw new Error(err?.response?.data?.message || err?.message || 'Failed to fetch payment details');
     }
   }
 
   // List all transactions for a user
-  static async listTransactions(email?: string, page: number = 1): Promise<any> {
+  static async listTransactions(email?: string, page: number = 1): Promise<unknown> {
     try {
-      const params: any = { page, perPage: 50 };
+      const params: Record<string, unknown> = { page, perPage: 50 };
       if (email) params.customer = email;
 
       const response = await axios.get(`${PAYSTACK_BASE_URL}/transaction`, {
@@ -172,8 +171,9 @@ export class PaymentService {
 
       return response.data;
     } catch (error: unknown) {
-      Logger.error('Failed to list transactions:', error.response?.data || error);
-      throw new Error('Failed to list transactions');
+      const err = error as any;
+      Logger.error('Failed to list transactions:', err?.response?.data || err);
+      throw new Error(err?.response?.data?.message || err?.message || 'Failed to list transactions');
     }
   }
 }

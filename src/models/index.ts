@@ -8,5 +8,4 @@ export { default as Payment } from './Payment';
 export type { IPayment } from './Payment';
 export { default as Notification } from './Notification';
 export type { INotification } from './Notification';
-export { default as Analytics } from './Analytics';
-export type { IAnalytics } from './Analytics';
+// Analytics model removed during cleanup (no runtime references)
