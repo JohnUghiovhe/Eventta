@@ -29,11 +29,12 @@ export class EventController {
         data: event
       });
     } catch (error: unknown) {
+      const err = error as Error;
       Logger.error('Create event error:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to create event',
-        error: error.message
+        error: err?.message
       });
     }
   }

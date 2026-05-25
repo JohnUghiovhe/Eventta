@@ -167,14 +167,15 @@ export class EmailService {
           Logger.info(`Email sent to ${options.to} via transport ${index + 1}`);
           return true;
         } catch (error: unknown) {
-          lastError = error;
+          const err = error as any;
+          lastError = err;
           Logger.warn(
-            `Email send attempt ${index + 1}/${transporters.length} failed on ${EMAIL_HOST}:${port} - ${error?.message || 'Unknown error'}`
+            `Email send attempt ${index + 1}/${transporters.length} failed on ${EMAIL_HOST}:${port} - ${err?.message || 'Unknown error'}`
           );
         }
       }
 
-      Logger.error(`Email sending failed for ${options.to} after all SMTP attempts:`, lastError?.message);
+      Logger.error(`Email sending failed for ${options.to} after all SMTP attempts:`, (lastError as any)?.message || lastError);
       return false;
     } catch (error) {
       Logger.error('Email sending failed:', error);

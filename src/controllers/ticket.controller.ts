@@ -2,7 +2,7 @@ import { Response } from 'express';
 import Ticket from '../models/Ticket';
 import Event from '../models/Event';
 import User from '../models/User';
-import { AuthRequest, TicketStatus } from '../types';
+import { AuthRequest, TicketStatus, IEvent } from '../types';
 import { NotificationService } from '../services/notification.service';
 import { QRCodeService } from '../services/qrcode.service';
 import { EmailService } from '../services/email.service';
@@ -106,7 +106,7 @@ export class TicketController {
         return;
       }
 
-      const event: any = ticket.event;
+      const event = ticket.event as unknown as IEvent;
 
       // Check if the current user is the event creator
       const eventCreatorId = event.creator?.toString() || event.creator;
@@ -182,7 +182,7 @@ export class TicketController {
         return;
       }
 
-      const event: any = ticket.event;
+      const event = ticket.event as unknown as IEvent;
 
       // Check if the current user is the event creator
       const eventCreatorId = event.creator?.toString() || event.creator;
@@ -246,7 +246,7 @@ export class TicketController {
         return;
       }
 
-      const event: any = ticket.event;
+      const event = ticket.event as unknown as IEvent;
       const newReminderDate = calculateReminderDate(event.startDate, reminder);
 
       // Update ticket reminder
@@ -338,7 +338,7 @@ export class TicketController {
         return;
       }
 
-      const event: any = ticket.event;
+      const event = ticket.event as unknown as IEvent;
 
       // Check if the current user is the event creator
       const eventCreatorId = event.creator?.toString() || event.creator;
@@ -401,7 +401,7 @@ export class TicketController {
         return;
       }
 
-      const event: any = ticket.event;
+      const event = ticket.event as unknown as IEvent;
 
       // Check if the current user is the event creator
       const eventCreatorId = event.creator?.toString() || event.creator;
@@ -620,11 +620,12 @@ export class TicketController {
         data: { ticket: populatedTicket }
       });
     } catch (error: unknown) {
+      const err = error as Error;
       Logger.error('Claim free ticket error:', error);
       res.status(500).json({
         success: false,
-        message: error.message || 'Failed to claim free ticket',
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        message: err?.message || 'Failed to claim free ticket',
+        error: process.env.NODE_ENV === 'development' ? err?.message : undefined
       });
     }
   }
