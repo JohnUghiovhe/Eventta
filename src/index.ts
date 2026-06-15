@@ -31,7 +31,8 @@ const corsOptions = {
     const allowedOrigins = [
       SYSTEM_MESSAGES.defaultFrontendDeploymentUrl,
       'http://localhost:3000',
-      'http://localhost:5000'
+      'http://localhost:5000',
+      'http://localhost:5173'
     ];
     
     // Allow requests with no origin (like mobile apps or curl requests)

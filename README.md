@@ -1,26 +1,11 @@
 # Eventta — Event Ticketing Platform
 
-Eventta (formerly Eventful) is a full-stack event ticketing and management platform. This README summarizes recent refactors and how to run, build, and test the project locally.
+Eventta is a full-stack event ticketing and management platform. This README summarizes recent refactors and how to run, build, and test the project locally.
 
 **Quick links:**
 - Backend entry: [src/index.ts](src/index.ts#L1)
 - Backend system messages: [src/utils/systemMessages.ts](src/utils/systemMessages.ts#L1)
 - Frontend system messages: [frontend/src/utils/systemMessages.ts](frontend/src/utils/systemMessages.ts#L1)
-
-**Highlights of recent changes**
-- Rebranded project source to "Eventta" (all active source files).
-- Restored a clean, virus-free `frontend/tailwind.config.js` and removed injected payloads.
-- Centralized all user-facing text into shared system message files:
-  - Backend: [src/utils/systemMessages.ts](src/utils/systemMessages.ts#L1)
-  - Frontend: [frontend/src/utils/systemMessages.ts](frontend/src/utils/systemMessages.ts#L1)
-- Implemented email verification-on-signup flow (backend verification token + frontend `/verify` landing page).
-- Replaced hardcoded response strings in controllers and pages with `SYSTEM_MESSAGES` constants.
-- Added robust global error handling and normalization using `AppError` and middleware:
-  - Error helper: [src/utils/errors.ts](src/utils/errors.ts#L1)
-  - Global middleware: [src/middleware/errorHandler.ts](src/middleware/errorHandler.ts#L1)
-- Fixed TypeScript config issues across backend and frontend to eliminate deprecation/warning messages.
-- Added unit and integration tests for core utilities, responses, and the verification flow.
-- Set Git behavior to avoid repeated merge commits from pulls: `git config pull.rebase true` (recommended).
 
 **Project structure (short)**
 ```

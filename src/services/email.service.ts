@@ -34,21 +34,22 @@ const createTransporter = (port: number, secure: boolean) => {
     host: EMAIL_HOST,
     port,
     secure,
-    connectionTimeout: 10000,    // 10 seconds (reduced from 15s)
-    greetingTimeout: 5000,       // 5 seconds (reduced from 15s)
-    socketTimeout: 15000,        // 15 seconds (reduced from 30s)
+    requireTLS: true,
+    pool: true,
+    maxConnections: 5,
+    maxMessages: 100,
+    rateDelta: 250,
+    rateLimit: 5,
+    connectionTimeout: 10000,
+    greetingTimeout: 5000,
+    socketTimeout: 15000,
     auth: {
       user: EMAIL_USER,
       pass: EMAIL_PASSWORD
+    },
+    tls: {
+      rejectUnauthorized: false
     }
-  };
-
-  // Pool configuration
-  (transportConfig as any).pool = {
-    maxConnections: 5,           // Connection pooling for reuse
-    maxMessages: 100,            // Max messages per connection
-    rateDelta: 250,              // Rate limit messages
-    rateLimit: 5                 // Max 5 messages per rateDelta
   };
 
   const transporter = nodemailer.createTransport(transportConfig);
