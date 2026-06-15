@@ -14,7 +14,7 @@ import passport from 'passport';
 dotenv.config();
 
 const JWT_SECRET: string = process.env.JWT_SECRET || 'your-secret-key';
-const FRONTEND_URL: string = process.env.FRONTEND_URL || 'http://localhost:5173';
+const FRONTEND_URL: string = process.env.FRONTEND_URL || 'http://localhost:3000';
 const getErrorMessage = (error: unknown): string =>
   error instanceof Error ? error.message : 'Unknown error';
 
@@ -52,8 +52,7 @@ export class AuthController {
         emailVerificationExpires: verificationExpiry
       });
 
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
+      const verificationUrl = `${FRONTEND_URL}/verify-email?token=${verificationToken}`;
 
       const verificationEmailSent = await EmailService.sendVerificationEmail(user.email, firstName, verificationUrl);
       if (!verificationEmailSent) {
@@ -203,8 +202,7 @@ export class AuthController {
       user.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000);
       await user.save();
 
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+      const resetUrl = `${FRONTEND_URL}/reset-password?token=${resetToken}`;
 
       const emailSent = await EmailService.sendPasswordResetEmail(user.email, resetUrl);
 

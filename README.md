@@ -1,6 +1,6 @@
 # Eventta — Event Ticketing Platform
 
-Eventta is a full-stack event ticketing and management platform. This README summarizes recent refactors and how to run, build, and test the project locally.
+Eventta is a full-stack event ticketing and management platform with email/password and Google OAuth authentication. This README summarizes how to run, build, and test the project locally.
 
 **Quick links:**
 - Backend entry: [src/index.ts](src/index.ts#L1)
@@ -92,7 +92,10 @@ git config pull.rebase true
 ```
 
 **Where to look in code**
-- Verification and auth controllers: [src/controllers/auth.controller.ts](src/controllers/auth.controller.ts#L1)
+- Auth controllers (register, login, Google OAuth): [src/controllers/auth.controller.ts](src/controllers/auth.controller.ts#L1)
+- Passport strategies (local, JWT, Google OAuth): [src/config/passport.ts](src/config/passport.ts#L1)
+- Auth routes (including Google OAuth routes): [src/routes/auth.routes.ts](src/routes/auth.routes.ts#L1)
+- User model (with Google OAuth fields): [src/models/User.ts](src/models/User.ts#L1)
 - Email service: [src/services/email.service.ts](src/services/email.service.ts#L1)
 - System messages (backend): [src/utils/systemMessages.ts](src/utils/systemMessages.ts#L1)
 - System messages (frontend): [frontend/src/utils/systemMessages.ts](frontend/src/utils/systemMessages.ts#L1)
@@ -119,6 +122,7 @@ If you want me to commit the README update now, tell me and I'll prepare the com
 - MongoDB (local or MongoDB Atlas)
 - Redis (local or managed Redis)
 - Git
+- Google Cloud Console account (for Google OAuth)
 
 ### Quick Setup
 
@@ -143,7 +147,45 @@ npm install
 npm run dev
 ```
 
-The backend runs on http://localhost:5000 and frontend on http://localhost:3000
+The backend runs on http://localhost:5000 and frontend on http://localhost:5173
+
+### Environment Variables
+
+| Variable | Description | Required |
+|---|---|---|
+| `MONGODB_URI` | MongoDB connection string | Yes |
+| `REDIS_URL` | Redis connection string | Yes |
+| `JWT_SECRET` | Secret for signing JWT tokens (min 32 chars in production) | Yes |
+| `PAYSTACK_SECRET_KEY` | Paystack API secret key | Yes |
+| `EMAIL_USER` | Gmail address for sending emails | Yes |
+| `EMAIL_PASSWORD` | Gmail app-specific password | Yes |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | No (OAuth disabled if missing) |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | No (OAuth disabled if missing) |
+| `GOOGLE_CALLBACK_URL` | Google OAuth redirect URI (see setup below) | No (but recommended) |
+| `FRONTEND_URL` | Frontend URL for OAuth callbacks and CORS | Yes |
+
+### Google OAuth Setup
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create a new OAuth 2.0 Client ID (Web application type)
+3. Add authorized redirect URIs:
+   - **Development**: `http://localhost:5000/api/auth/google/callback`
+   - **Production**: `https://your-backend-domain.com/api/auth/google/callback`
+4. Copy the Client ID and Client Secret to your `.env`:
+```dotenv
+GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-client-secret
+GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
+```
+
+#### Production callback URL
+
+Replace `GOOGLE_CALLBACK_URL` with your deployed backend URL:
+```dotenv
+GOOGLE_CALLBACK_URL=https://your-app.onrender.com/api/auth/google/callback
+```
+
+This must match **exactly** what you entered in Google Cloud Console as an authorized redirect URI. For Render deployments, the URL will be `https://<your-service-name>.onrender.com/api/auth/google/callback`. The backend redirects to `FRONTEND_URL/auth/callback?token=<jwt>` after successful authentication, so ensure `FRONTEND_URL` points to your deployed frontend.
 
 For detailed deployment instructions, see [DEPLOYMENT_RENDER.md](./DEPLOYMENT_RENDER.md).
 
@@ -194,7 +236,7 @@ Estimated deployment time: **15-20 minutes**
 - [ ] Event categories management
 - [ ] Advanced search and filtering
 - [ ] Mobile applications (iOS & Android)
-- [ ] Social authentication (Google, Facebook)
+- [x] Social authentication (Google)
 - [ ] Ticket transfers
 - [ ] Refund management
 - [ ] Event reviews and ratings
@@ -204,6 +246,7 @@ Estimated deployment time: **15-20 minutes**
 - Paystack for payment processing
 - Redis for caching capabilities
 - MongoDB for flexible data storage
+- Google for extra authentication
 - The Node.js and TypeScript communities
 
 ---

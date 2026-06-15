@@ -86,12 +86,15 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL;
 
 if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
+  if (!GOOGLE_CALLBACK_URL) {
+    Logger.warn('⚠️  GOOGLE_CALLBACK_URL is not set. Google OAuth will use a default callback URL. Set this in .env for your environment.');
+  }
   passport.use(
     new GoogleStrategy(
       {
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
-        callbackURL: GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback'
+        callbackURL: GOOGLE_CALLBACK_URL
       },
       async (_accessToken, _refreshToken, profile, done) => {
         try {
