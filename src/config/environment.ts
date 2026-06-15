@@ -25,12 +25,6 @@ export const config = {
   PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY,
   PAYSTACK_PUBLIC_KEY: process.env.PAYSTACK_PUBLIC_KEY,
 
-  // Email
-  EMAIL_SERVICE: process.env.EMAIL_SERVICE || 'gmail',
-  EMAIL_USER: process.env.EMAIL_USER,
-  EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
-  EMAIL_FROM: process.env.EMAIL_FROM || SYSTEM_MESSAGES.defaultEmailFrom,
-
   // Google OAuth
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
@@ -55,8 +49,6 @@ const requiredEnvVars = [
   'MONGODB_URI',
   'JWT_SECRET',
   'PAYSTACK_SECRET_KEY',
-  'EMAIL_USER',
-  'EMAIL_PASSWORD',
 ];
 
 const missingEnvVars = requiredEnvVars.filter(

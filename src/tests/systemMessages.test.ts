@@ -11,6 +11,5 @@ describe('SYSTEM_MESSAGES', () => {
   it('exposes the expected default runtime values', () => {
     expect(SYSTEM_MESSAGES.defaultMongoUri).toContain('eventta');
     expect(SYSTEM_MESSAGES.defaultApiBaseUrl).toContain('eventta');
-    expect(SYSTEM_MESSAGES.email.welcomeSubject).toBe('Welcome to Eventta!');
   });
 });
