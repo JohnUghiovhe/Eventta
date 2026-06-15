@@ -28,6 +28,7 @@ import PaymentVerify from './pages/PaymentVerify';
 import PaymentSuccess from './pages/PaymentSuccess';
 import TicketSuccess from './pages/TicketSuccess';
 import VerifyTickets from './pages/VerifyTickets';
+import AuthCallback from './pages/AuthCallback';
 import InactivityWrapper from './components/InactivityWrapper';
 import SupportChatbot from './components/SupportChatbot';
 
@@ -60,6 +61,7 @@ const App: React.FC = () => {
                   <Route path="/events/:id" element={<EventDetails />} />
                   <Route path="/payment/success" element={<PaymentSuccess />} />
                   <Route path="/ticket-success" element={<TicketSuccess />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
 
                   {/* Protected Routes */}
                   <Route

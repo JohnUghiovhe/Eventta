@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { IUser, UserRole } from '../types';
+import { IUser, UserRole, AuthProvider } from '../types';
 
 const userSchema = new Schema<IUser>(
   {
@@ -13,8 +13,16 @@ const userSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: true,
       minlength: 6
+    },
+    authProvider: {
+      type: String,
+      enum: Object.values(AuthProvider),
+      default: AuthProvider.LOCAL,
+      required: true
+    },
+    googleId: {
+      type: String
     },
     isEmailVerified: {
       type: Boolean,
@@ -55,8 +63,7 @@ const userSchema = new Schema<IUser>(
       type: String
     },
     phoneNumber: {
-      type: String,
-      required: true
+      type: String
     }
   },
   {
@@ -66,7 +73,7 @@ const userSchema = new Schema<IUser>(
 
 // Hash password before saving
 userSchema.pre('save', async function () {
-  if (!this.isModified('password')) {
+  if (!this.isModified('password') || !this.password) {
     return;
   }
 
@@ -78,6 +85,7 @@ userSchema.pre('save', async function () {
 userSchema.methods.comparePassword = async function (
   candidatePassword: string
 ): Promise<boolean> {
+  if (!this.password) return false;
   return bcrypt.compare(candidatePassword, this.password);
 };
 

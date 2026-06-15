@@ -14,6 +14,7 @@ import passport from 'passport';
 dotenv.config();
 
 const JWT_SECRET: string = process.env.JWT_SECRET || 'your-secret-key';
+const FRONTEND_URL: string = process.env.FRONTEND_URL || 'http://localhost:5173';
 const getErrorMessage = (error: unknown): string =>
   error instanceof Error ? error.message : 'Unknown error';
 
@@ -158,6 +159,25 @@ export class AuthController {
         resolve();
       })(req, res);
     });
+  }
+
+// Google OAuth callback
+  static googleCallback(req: Request, res: Response): void {
+    passport.authenticate('google', { session: false, failWithError: true }, (err: unknown, user: Express.User | false | null) => {
+      if (err || !user) {
+        Logger.error('Google authentication failed:', err);
+        res.redirect(`${FRONTEND_URL}/login?error=google_auth_failed`);
+        return;
+      }
+
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        JWT_SECRET as jwt.Secret,
+        { expiresIn: '7d' }
+      );
+
+      res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`);
+    })(req, res);
   }
 
 // Request password reset

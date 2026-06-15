@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import passport from 'passport';
 import { AuthController } from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth';
 import {
@@ -136,6 +137,35 @@ router.post('/register', authLimiter, validateRegistration, AuthController.regis
  *               $ref: '#/components/schemas/Error'
  */
 router.post('/login', authLimiter, validateLogin, AuthController.login);
+
+/**
+ * @swagger
+ * /api/auth/google:
+ *   get:
+ *     summary: Initiate Google OAuth login
+ *     tags: [Authentication]
+ *     description: Redirect user to Google for authentication. Role - Public
+ *     responses:
+ *       302:
+ *         description: Redirect to Google consent screen
+ */
+router.get('/google', passport.authenticate('google', {
+  session: false,
+  scope: ['profile', 'email']
+}));
+
+/**
+ * @swagger
+ * /api/auth/google/callback:
+ *   get:
+ *     summary: Google OAuth callback
+ *     tags: [Authentication]
+ *     description: Handle Google OAuth callback and redirect to frontend with token. Role - Public
+ *     responses:
+ *       302:
+ *         description: Redirect to frontend with JWT token
+ */
+router.get('/google/callback', AuthController.googleCallback);
 
 /**
  * @swagger

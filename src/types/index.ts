@@ -6,6 +6,11 @@ export enum UserRole {
   EVENTEE = 'eventee'
 }
 
+export enum AuthProvider {
+  LOCAL = 'local',
+  GOOGLE = 'google'
+}
+
 export enum EventStatus {
   DRAFT = 'draft',
   PUBLISHED = 'published',
@@ -51,7 +56,9 @@ export enum NotificationType {
 
 export interface IUser extends Document {
   email: string;
-  password: string;
+  password?: string;
+  authProvider: AuthProvider;
+  googleId?: string;
   isEmailVerified?: boolean;
   emailVerificationToken?: string;
   emailVerificationExpires?: Date;
