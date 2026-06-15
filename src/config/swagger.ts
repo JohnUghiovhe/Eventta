@@ -5,7 +5,8 @@ import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 const renderExternalUrl = process.env.RENDER_EXTERNAL_URL;
 const apiBaseUrl = config.API_BASE_URL || renderExternalUrl;
 const localBaseUrl = `http://localhost:${config.PORT || 5000}`;
-const effectiveBaseUrl = apiBaseUrl || (config.NODE_ENV === 'production'
+const effectiveBaseUrl = (apiBaseUrl?.replace(/\/api\/?$/, '')) || (config.NODE_ENV === 
+     'production'
   ? SYSTEM_MESSAGES.defaultApiBaseUrl
   : localBaseUrl);
 
@@ -260,6 +261,10 @@ const options: swaggerJsdoc.Options = {
       {
         name: 'Notifications',
         description: 'Notification management endpoints'
+      },
+      {
+        name: 'Health',
+        description: 'API health check endpoints'
       }
     ]
   },

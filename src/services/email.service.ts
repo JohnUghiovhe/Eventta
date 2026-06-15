@@ -8,13 +8,13 @@ import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 dotenv.config();
 
 const resolveTemplateDir = () => {
-  const distPath = path.resolve(__dirname, '..', 'templates');
-  const srcPath = path.resolve(process.cwd(), 'src', 'templates');
-  return process.env.NODE_ENV === 'production' ? distPath : srcPath;
+  const rootTemplates = path.resolve(process.cwd(), 'src', 'templates');
+  const prodTemplates = path.resolve(process.cwd(), 'dist', 'templates');
+  return process.env.NODE_ENV === 'production' ? prodTemplates : rootTemplates;
 };
 
 const EMAIL_HOST = process.env.EMAIL_HOST || 'smtp.gmail.com';
-const EMAIL_PORT = parseInt(process.env.EMAIL_PORT || '587', 10);
+const EMAIL_PORT = parseInt(process.env.EMAIL_PORT || '465', 10); 
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASSWORD = (process.env.EMAIL_PASSWORD || '').replace(/\s+/g, '');
 
@@ -452,3 +452,5 @@ export class EmailService {
   }
 }
 
+// At the bottom of your emailService.ts file:
+export const transporter = transporters[0];

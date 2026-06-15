@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc && npm run copy-templates",
-    "copy-templates": "node -e \"const fs = require('fs'); const path = require('path'); const src = path.join(__dirname, 'src', 'templates'); const dest = path.join(__dirname, 'dist', 'templates'); if (fs.existsSync(src)) { fs.cpSync(src, dest, { recursive: true }); console.log('✅ Email templates copied to dist'); } else { console.log('ℹ️ No templates directory found'); }\"",
+    "copy-templates": "node -e \"const fs = require('fs'); const path = require('path'); const src = path.join(process.cwd(), 'src', 'templates'); const dest = path.join(process.cwd(), 'dist', 'templates'); if (fs.existsSync(src)) { fs.cpSync(src, dest, { recursive: true }); console.log('✅ Email templates copied to dist'); } else { console.log('ℹ️ No templates directory found'); }\"",
     "start": "node dist/index.js",
     "db:cleanup": "ts-node src/scripts/dbCleanup.ts",
     "test": "jest --coverage",

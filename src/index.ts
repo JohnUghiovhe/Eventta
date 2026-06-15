@@ -17,6 +17,7 @@ import { swaggerSpec } from './config/swagger';
 import { AppError } from './middleware/errorHandler';
 import { SYSTEM_MESSAGES } from './utils/systemMessages';
 import { config } from './config/environment';
+import healthRoutes from './routes/health.routes';
 
 dotenv.config();
 
@@ -26,6 +27,9 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
+
+// Health 
+app.use('/api', healthRoutes);
 
 // CORS configuration - must be before other middleware
 // Add extra origins via CORS_ORIGINS env var (comma-separated)
@@ -86,7 +90,7 @@ app.get('/health', (_req, res) => {
 });
 
 // Swagger API Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: SYSTEM_MESSAGES.apiDocumentationTitle,
   customfavIcon: '/favicon.ico'
