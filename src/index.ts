@@ -16,6 +16,7 @@ import { fixPaymentIndex } from './scripts/fixPaymentIndex';
 import { swaggerSpec } from './config/swagger';
 import { AppError } from './middleware/errorHandler';
 import { SYSTEM_MESSAGES } from './utils/systemMessages';
+import { config } from './config/environment';
 
 dotenv.config();
 
@@ -26,13 +27,20 @@ const PORT = process.env.PORT || 5000;
 app.use(helmet());
 
 // CORS configuration - must be before other middleware
+// Add extra origins via CORS_ORIGINS env var (comma-separated)
+const extraOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',').map(s => s.trim())
+  : [];
+
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     const allowedOrigins = [
+      config.FRONTEND_URL,
       SYSTEM_MESSAGES.defaultFrontendDeploymentUrl,
       'http://localhost:3000',
       'http://localhost:5000',
-      'http://localhost:5173'
+      'http://localhost:5173',
+      ...extraOrigins,
     ];
     
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -40,7 +48,7 @@ const corsOptions = {
       callback(null, true);
     } else {
       console.warn(`CORS blocked origin: ${origin}`);
-      callback(null, true); // Still allow for now, log for debugging
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
   credentials: true,
