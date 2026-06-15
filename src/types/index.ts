@@ -60,10 +60,6 @@ export interface IUser extends Document {
   authProvider: AuthProvider;
   googleId?: string;
   isEmailVerified?: boolean;
-  emailVerificationToken?: string;
-  emailVerificationExpires?: Date;
-  passwordResetToken?: string;
-  passwordResetExpires?: Date;
   firstName: string;
   lastName: string;
   role: UserRole;

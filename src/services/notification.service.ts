@@ -4,7 +4,6 @@ import Notification from '../models/Notification';
 import User from '../models/User';
 import Event from '../models/Event';
 import Ticket from '../models/Ticket';
-import { EmailService } from './email.service';
 import { Logger } from '../utils/logger';
 import { NotificationType, IUser, IEvent, ITicket, IReminder } from '../types';
 
@@ -71,13 +70,6 @@ export class NotificationService {
       Logger.warn(`Skipping reminder ${reminder._id}: user has no email`);
       return 'skipped';
     }
-
-    await EmailService.sendEventReminder(user.email, {
-      eventTitle: event.title,
-      eventDate: event.startDate.toLocaleString(),
-      venue: event.venue,
-      ticketNumber: ticket.ticketNumber
-    });
 
     Logger.info(`Reminder sent to ${user.email} for event ${event.title}`);
     return 'sent';

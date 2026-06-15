@@ -5,9 +5,7 @@ import User from '../models/User';
 import { AuthRequest, TicketStatus, IEvent } from '../types';
 import { NotificationService } from '../services/notification.service';
 import { QRCodeService } from '../services/qrcode.service';
-import { EmailService } from '../services/email.service';
 import { Logger } from '../utils/logger';
-import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 import {
   calculateReminderDate,
   getPaginationParams,
@@ -565,49 +563,6 @@ export class TicketController {
         ticket._id.toString(),
         reminderDate
       );
-
-      // Send confirmation email asynchronously
-      setImmediate(async () => {
-        try {
-          // Get organizer details
-          let organizerName: string = SYSTEM_MESSAGES.appName;
-          if (event.creator) {
-            const organizer = await User.findById(event.creator).select('firstName lastName');
-            if (organizer) {
-              organizerName = `${organizer.firstName || ''} ${organizer.lastName || ''}`.trim();
-            }
-          }
-
-          const eventDate = event.startDate.toLocaleString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          });
-
-          await EmailService.sendTicketConfirmation(
-            user.email,
-            {
-              eventTitle: event.title,
-              ticketNumber,
-              eventDate,
-              venue: event.venue,
-              qrCode,
-              ticketId: ticket._id.toString(),
-              eventDescription: event.description,
-              eventCategory: event.category,
-              ticketPrice: 0,
-              organizerName
-            }
-          );
-
-          Logger.info(`Free ticket confirmation email sent to ${user.email}`);
-        } catch (emailError) {
-          Logger.error('Error sending free ticket email:', emailError);
-        }
-      });
 
       // Populate ticket with event details for response
       const populatedTicket = await Ticket.findById(ticket._id)

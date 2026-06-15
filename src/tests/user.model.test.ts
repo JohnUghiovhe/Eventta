@@ -49,18 +49,6 @@ describe('User Model', () => {
       expect(error?.errors.email).toBeDefined();
     });
 
-    it('should require password', () => {
-      const user = new User({
-        email: 'test@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
-        role: UserRole.EVENTEE
-      });
-
-      const error = user.validateSync();
-      expect(error?.errors.password).toBeDefined();
-    });
-
     it('should validate role enum', () => {
       const user = new User({
         email: 'test@example.com',

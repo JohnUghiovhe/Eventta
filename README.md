@@ -35,7 +35,7 @@ npm install
 # Development (hot reload via nodemon + ts-node)
 npm run dev
 
-# Build (TypeScript compile) and copy templates
+# Build (TypeScript compile)
 npm run build
 
 # Start production app (after build)
@@ -73,13 +73,13 @@ npm run test:watch
 npm test -- --coverage
 ```
 
-Test coverage includes unit tests for utilities and services, model validation tests, and integration tests for API endpoints. New tests were added around system messages, error handling, and the verification flow.
+Test coverage includes unit tests for utilities and services, model validation tests, and integration tests for API endpoints.
 
-**Verification / Email flow (how it works)**
-- When a user registers the backend creates a verification token and sends a verification email using `src/services/email.service.ts`.
-- Email content and subject lines are driven by `SYSTEM_MESSAGES.email.*` constants.
-- The verification landing page is implemented in the frontend and expects a `token` query parameter; it calls the backend verify endpoint and redirects on success to `/dashboard?verified=true`.
-- Frontend pages and toasts use `frontend/src/utils/systemMessages.ts` for copy.
+**Authentication flow (how it works)**
+- Users can register with email/password via `POST /api/auth/register`. On success, a JWT token is returned immediately — no email verification required.
+- Returning users log in via `POST /api/auth/login` with email/password and receive a JWT token.
+- Google OAuth is available via `GET /api/auth/google`. After successful authentication, the backend redirects to the frontend callback page with a JWT token.
+- Protected routes require a valid JWT in the `Authorization: Bearer <token>` header.
 
 **Global error handling**
 - Validation and operational errors are wrapped in `AppError` and normalized by `src/middleware/errorHandler.ts` before being sent to clients.
@@ -96,7 +96,6 @@ git config pull.rebase true
 - Passport strategies (local, JWT, Google OAuth): [src/config/passport.ts](src/config/passport.ts#L1)
 - Auth routes (including Google OAuth routes): [src/routes/auth.routes.ts](src/routes/auth.routes.ts#L1)
 - User model (with Google OAuth fields): [src/models/User.ts](src/models/User.ts#L1)
-- Email service: [src/services/email.service.ts](src/services/email.service.ts#L1)
 - System messages (backend): [src/utils/systemMessages.ts](src/utils/systemMessages.ts#L1)
 - System messages (frontend): [frontend/src/utils/systemMessages.ts](frontend/src/utils/systemMessages.ts#L1)
 - Error helpers: [src/utils/errors.ts](src/utils/errors.ts#L1)
@@ -111,11 +110,6 @@ cd frontend && npm run build
 ```
 
 ---
-If you'd like, I can:
-- split and stage the README changes into a commit for you, or
-- regenerate the frontend `dist` and clear stale artifacts.
-
-If you want me to commit the README update now, tell me and I'll prepare the commit commands.
 
 ### Prerequisites
 - Node.js 18+
@@ -157,8 +151,6 @@ The backend runs on http://localhost:5000 and frontend on http://localhost:5173
 | `REDIS_URL` | Redis connection string | Yes |
 | `JWT_SECRET` | Secret for signing JWT tokens (min 32 chars in production) | Yes |
 | `PAYSTACK_SECRET_KEY` | Paystack API secret key | Yes |
-| `EMAIL_USER` | Gmail address for sending emails | Yes |
-| `EMAIL_PASSWORD` | Gmail app-specific password | Yes |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID | No (OAuth disabled if missing) |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | No (OAuth disabled if missing) |
 | `GOOGLE_CALLBACK_URL` | Google OAuth redirect URI (see setup below) | No (but recommended) |

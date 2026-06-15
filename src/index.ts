@@ -9,7 +9,6 @@ import passport from './config/passport';
 import routes from './routes';
 import { errorHandler } from './middleware/errorHandler';
 import { NotificationService } from './services/notification.service';
-import { EmailService } from './services/email.service';
 import { Logger } from './utils/logger';
 import { seedEvents } from './scripts/seed';
 import { fixPaymentIndex } from './scripts/fixPaymentIndex';
@@ -124,15 +123,6 @@ const startServer = async () => {
 
     // Connect to Redis
     await connectRedis();
-
-    // Validate email configuration
-    const emailConfig = EmailService.validateConfig();
-    if (!emailConfig.valid) {
-      Logger.warn('⚠️  Email service is not properly configured:', emailConfig.errors);
-      Logger.warn('⚠️  Password reset and email notifications will not work');
-    } else {
-      Logger.info('✓ Email service configuration validated');
-    }
 
     const shouldRunMaintenanceTasks = process.env.NODE_ENV !== 'production';
 

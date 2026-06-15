@@ -165,14 +165,6 @@ const Login: React.FC = () => {
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
                 )}
-                <p className="mt-2 text-right text-sm">
-                  <Link
-                    to="/forgot-password"
-                    className="font-medium text-indigo-600 hover:text-indigo-500"
-                  >
-                    Forgot password?
-                  </Link>
-                </p>
               </div>
             </div>
 

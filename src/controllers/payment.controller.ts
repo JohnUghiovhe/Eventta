@@ -6,10 +6,8 @@ import User from '../models/User';
 import { AuthRequest, PaymentStatus, TicketStatus, IPayment, ITicket, IEvent } from '../types';
 import { PaymentService } from '../services/payment.service';
 import { QRCodeService } from '../services/qrcode.service';
-import { EmailService } from '../services/email.service';
 import { NotificationService } from '../services/notification.service';
 import { Logger } from '../utils/logger';
-import { SYSTEM_MESSAGES } from '../utils/systemMessages';
 import {
   generateTicketNumber,
   generateReference,
@@ -201,10 +199,9 @@ export class PaymentController {
       payment.paystackResponse = paystackResponse;
       await payment.save();
 
-      // Get event and user
+      // Get event
       const event = payment.event as unknown as IEvent;
       const paymentMeta = (payment.metadata || {}) as { ticketNumber?: string; reminder?: string | undefined; [key: string]: any };
-      const user = await User.findById(payment.user);
 
       const metadata = (payment.metadata || {}) as Record<string, unknown>;
       const ticketNumberFromMeta = String(metadata.ticketNumber || paymentMeta.ticketNumber || generateTicketNumber());
@@ -279,46 +276,6 @@ export class PaymentController {
           ticket._id.toString(),
           reminderDate
         );
-      }
-
-      // Send confirmation email asynchronously to avoid blocking the response
-      if (isNewTicket && user?.email) {
-        setImmediate(async () => {
-          try {
-            // Get organizer details for email
-            let organizerName: string = SYSTEM_MESSAGES.appName;
-            // Use event.creator as organizer reference
-            if (event.creator) {
-              const organizer = await User.findById(event.creator);
-              if (organizer) {
-                organizerName = `${organizer.firstName} ${organizer.lastName}`;
-              }
-            }
-
-            await EmailService.sendTicketConfirmation(user.email, {
-              eventTitle: event.title,
-              ticketNumber: ticket.ticketNumber,
-              eventDate: event.startDate.toLocaleString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              }),
-              venue: event.venue,
-              qrCode,
-              ticketId: ticket._id.toString(),
-              eventDescription: event.description,
-              eventCategory: event.category,
-              ticketPrice: payment.amount,
-              organizerName
-            });
-            Logger.info(`Confirmation email sent to ${user.email} for ticket ${ticket.ticketNumber}`);
-          } catch (emailError) {
-            Logger.error('Failed to send confirmation email:', emailError);
-          }
-        });
       }
 
       Logger.info(`Payment verification successful: ${reference}`, { ticketId: ticket._id });
@@ -591,23 +548,6 @@ export class PaymentController {
         ticket._id.toString(),
         reminderDate
       );
-
-      // Send confirmation email asynchronously to avoid blocking the response
-      if (user?.email) {
-        setImmediate(async () => {
-          try {
-            await EmailService.sendTicketConfirmation(user.email, {
-              eventTitle: event.title,
-              ticketNumber: ticket.ticketNumber,
-              eventDate: event.startDate.toLocaleString(),
-              venue: event.venue,
-              qrCode
-            });
-          } catch (emailError) {
-            Logger.error('Failed to send demo confirmation email:', emailError);
-          }
-        });
-      }
 
       res.status(200).json({
         success: true,
